@@ -143,10 +143,131 @@ namespace Formulas
 
             foreach (string token in GetTokens(formulaString))
             {
+                double currentValue = 0; // TODO hack...
+
+                if (IsVariableToken(token))
+                {
+                    try
+                    {
+                        currentValue = lookup(token);
+                    }
+                    catch (UndefinedVariableException)
+                    {
+                        throw new FormulaEvaluationException("Undefined variable in formula");
+                    }
+                }
+
+                if (IsVariableToken(token) || double.TryParse(token, out currentValue))
+                {
+                    if (operatorStack.Count > 0 && (operatorStack.Peek() == "*" || operatorStack.Peek() == "/"))
+                    {
+                        string poppedOperator = operatorStack.Pop();
+                        double poppedValue = valueStack.Pop();
+
+                        if (poppedOperator == "*")
+                        {
+                            valueStack.Push(poppedValue * currentValue);
+                        }
+                        else
+                        {
+                            valueStack.Push(poppedValue / currentValue);
+                        }
+
+                    }
+                    else
+                    {
+                        valueStack.Push(currentValue);
+                    }
+
+                }
+                else if (token == "+" || token == "-")
+                {
+                    if (operatorStack.Count > 0 && (operatorStack.Peek() == "+" || operatorStack.Peek() == "-"))
+                    {
+                        string poppedOperator = operatorStack.Pop();
+                        double rhs = valueStack.Pop();
+
+                        if (poppedOperator == "+")
+                        {
+                            valueStack.Push(valueStack.Pop() + rhs);
+                        }
+                        else
+                        {
+                            valueStack.Push(valueStack.Pop() - rhs);
+                        }
+                    }
+
+                    operatorStack.Push(token);
+                }
+                else if (token == "*" || token == "/" || token == "(")
+                {
+                    operatorStack.Push(token);
+                }
+                else if (token == ")")
+                {
+                    // TODO copied code from above, bad!
+                    if (operatorStack.Count > 0 && (operatorStack.Peek() == "+" || operatorStack.Peek() == "-"))
+                    {
+                        string poppedOperator = operatorStack.Pop();
+                        double rhs = valueStack.Pop();
+
+                        if (poppedOperator == "+")
+                        {
+                            valueStack.Push(valueStack.Pop() + rhs);
+                        }
+                        else
+                        {
+                            valueStack.Push(valueStack.Pop() - rhs);
+                        }
+                    }
+
+                    operatorStack.Pop(); // value should be "("
+
+                    if (operatorStack.Count > 0 && (operatorStack.Peek() == "*" || operatorStack.Peek() == "/"))
+                    {
+                        string poppedOperator = operatorStack.Pop();
+                        double rhs = valueStack.Pop();
+
+                        if (poppedOperator == "*")
+                        {
+                            valueStack.Push(valueStack.Pop() * rhs);
+                        }
+                        else
+                        {
+                            valueStack.Push(valueStack.Pop() / rhs);
+                        }
+                    }
+                }
 
             }
 
-            return 0;
+            if (operatorStack.Count == 0)
+            {
+                return valueStack.Pop();
+            }
+            else
+            {
+                string oper = operatorStack.Pop();
+                double rhs = valueStack.Pop();
+
+                if (oper == "+")
+                {
+                    return valueStack.Pop() + rhs;
+                }
+                else if (oper == "-")
+                {
+                    return valueStack.Pop() - rhs;
+                }
+                else if (oper == "*")
+                {
+                    return valueStack.Pop() * rhs;
+                }
+                else
+                {
+                    return valueStack.Pop() / rhs;
+                }
+                
+            }
         }
 
         /// <summary>

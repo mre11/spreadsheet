@@ -90,6 +90,7 @@ namespace FormulaTestCases
         /// The delegate passed to Evaluate is defined below.  We check
         /// that evaluating the formula returns in 10.
         /// </summary>
+        [TestMethod]
         public void Evaluate4()
         {
             Formula f = new Formula("x + y");
@@ -99,9 +100,10 @@ namespace FormulaTestCases
         /// <summary>
         /// This uses one of each kind of token.
         /// </summary>
+        [TestMethod]
         public void Evaluate5 ()
         {
-            Formula f = new Formula("(x + y) * (z / y) * 1.0");
+            Formula f = new Formula("(x + y) * (z / x) * 1.0");
             Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
         }
 
