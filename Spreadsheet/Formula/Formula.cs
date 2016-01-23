@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Formulas
@@ -143,7 +141,7 @@ namespace Formulas
 
             foreach (string token in GetTokens(formulaString))
             {
-                double currentValue = 0; // TODO hack...
+                double currentValue = -1; // TODO hack...
 
                 if (IsVariableToken(token))
                 {
@@ -170,6 +168,10 @@ namespace Formulas
                         }
                         else
                         {
+                            if (currentValue == 0)
+                            {
+                                throw new FormulaEvaluationException("Divide by zero");
+                            }
                             valueStack.Push(poppedValue / currentValue);
                         }
 
@@ -234,6 +236,10 @@ namespace Formulas
                         }
                         else
                         {
+                            if (rhs == 0)
+                            {
+                                throw new FormulaEvaluationException("Divide by zero");
+                            }
                             valueStack.Push(valueStack.Pop() / rhs);
                         }
                     }
@@ -264,6 +270,10 @@ namespace Formulas
                 }
                 else
                 {
+                    if (rhs == 0)
+                    {
+                        throw new FormulaEvaluationException("Divide by zero");
+                    }
                     return valueStack.Pop() / rhs;
                 }
                 

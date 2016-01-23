@@ -1,4 +1,5 @@
 ﻿// Written by Joe Zachary for CS 3500, January 2016.
+// Modified by Morgan Empey (u0634576) for CS 3500, Spring 2016, University of Utah
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
