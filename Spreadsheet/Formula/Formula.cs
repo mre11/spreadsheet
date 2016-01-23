@@ -19,6 +19,9 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
+        // Represents the formula as a string
+        private string formulaString;
+
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
@@ -41,6 +44,27 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+            // Store representation
+            formulaString = formula;
+
+            // Store formula in container as tokens
+            List<string> formulaTokens = GetTokens(formula).ToList<string>();
+
+            // Check that there is at least one token
+            if (formulaTokens.Count == 0)
+            {
+                throw new FormulaFormatException("Empty formula");
+            }
+              
+            // Check for invalid syntax
+            foreach (string token in GetTokens(formula))
+            {
+                if (!IsValidToken(token))
+                {
+                    throw new FormulaFormatException("Invalid token");
+                }
+            }
+            
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
@@ -85,6 +109,94 @@ namespace Formulas
                 }
             }
         }
+
+        /// <summary>
+        /// Returns true if the token is a valid formula token.  Valid tokens are:
+        ///     -Open or close parentheses
+        ///     -+, -, *, or /
+        ///     -Non-negative numbers
+        ///     -Variables, which consist of one or more letters followed by one or more numbers
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private Boolean IsValidToken(string token)
+        {
+            if (token.Equals("(") || token.Equals(")") ||
+                token.Equals("+") || token.Equals("-") ||
+                token.Equals("*") || token.Equals("/"))
+            {
+                return true;
+            }
+
+            double d;
+
+            if (Double.TryParse(token, out d))
+            {
+                return true;
+            }
+
+            if (IsVariableToken(token))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if the token is one or more letters followed by one or more numbers.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private Boolean IsVariableToken(string token)
+        {
+            if (!IsLetter(token[0]))
+            {
+                return false;
+            }
+            
+            foreach (char c in token)
+            {
+                if (!IsLetter(c) && !IsNumeral(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the character is an upper- or lower-case letter.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private Boolean IsLetter(char c)
+        {
+            if ((c > 64 && c < 91) || (c > 96 && c < 123))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if the character is a numeral 0-9
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private Boolean IsNumeral(char c)
+        {
+            if (c > 47 && c < 58)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        
     }
 
     /// <summary>
