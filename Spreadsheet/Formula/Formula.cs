@@ -43,17 +43,8 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
-            // Store representation
+            // Representation of the formula
             formulaString = formula;
-
-            // Store formula in container as tokens
-            //List<string> formulaTokens = GetTokens(formula).ToList<string>();
-
-            // Check that there is at least one token
-            //if (formulaTokens.Count == 0)
-            //{
-            //    throw new FormulaFormatException("Empty formula");
-            //}
 
             int tokenCount = 0;
             int openParenCount = 0;
@@ -93,7 +84,7 @@ namespace Formulas
                 {
                     if (!IsNumberToken(token) && !IsVariableToken(token) && token != "(")
                     {
-                        throw new FormulaFormatException("Invalid syntax"); // TODO better message here?
+                        throw new FormulaFormatException("Invalid formula syntax");
                     }
                 }
 
@@ -101,7 +92,7 @@ namespace Formulas
                 {
                     if (!IsOperatorToken(token) && token != ")")
                     {
-                        throw new FormulaFormatException("Invalid syntax"); // TODO better message here?
+                        throw new FormulaFormatException("Invalid formula syntax");
                     }
                 }
 
@@ -243,8 +234,8 @@ namespace Formulas
         /// <returns></returns>
         private Boolean IsValidToken(string token)
         {
-            if (token.Equals("(") ||
-                token.Equals(")") ||
+            if (token == "(" ||
+                token == ")" ||
                 IsOperatorToken(token) ||
                 IsNumberToken(token) ||
                 IsVariableToken(token))
@@ -355,7 +346,7 @@ namespace Formulas
                 case "/":
                     if (rhs == 0)
                     {
-                        throw new FormulaEvaluationException("Divide by zero");
+                        throw new FormulaEvaluationException("Cannot divide by zero");
                     }
                     return lhs / rhs;
                 default:
