@@ -316,7 +316,7 @@ namespace Formulas
         ///     -Open or close parentheses
         ///     -+, -, *, or /
         ///     -Floating-point numbers
-        ///     -Variables, which consist of one or more letters followed by one or more numbers
+        ///     -Variables, which consist of one or more letters followed by zero or more letters/digits
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
@@ -346,7 +346,7 @@ namespace Formulas
         }
 
         /// <summary>
-        /// Returns true if the token is one or more letters followed by one or more numbers.
+        /// Returns true if the token is one or more letters followed by zero or more letters/digits.
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
