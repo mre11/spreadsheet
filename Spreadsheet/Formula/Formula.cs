@@ -163,18 +163,20 @@ namespace Formulas
                         string poppedOperator = operatorStack.Pop();
                         double poppedValue = valueStack.Pop();
 
-                        if (poppedOperator == "*")
-                        {
-                            valueStack.Push(poppedValue * currentValue);
-                        }
-                        else
-                        {
-                            if (currentValue == 0)
-                            {
-                                throw new FormulaEvaluationException("Divide by zero");
-                            }
-                            valueStack.Push(poppedValue / currentValue);
-                        }
+                        valueStack.Push(PerformOperation(poppedValue, currentValue, poppedOperator));
+
+                        //if (poppedOperator == "*")
+                        //{
+                        //    valueStack.Push(poppedValue * currentValue);
+                        //}
+                        //else
+                        //{
+                        //    if (currentValue == 0)
+                        //    {
+                        //        throw new FormulaEvaluationException("Divide by zero");
+                        //    }
+                        //    valueStack.Push(poppedValue / currentValue);
+                        //}
 
                     }
                     else
@@ -190,14 +192,16 @@ namespace Formulas
                         string poppedOperator = operatorStack.Pop();
                         double rhs = valueStack.Pop();
 
-                        if (poppedOperator == "+")
-                        {
-                            valueStack.Push(valueStack.Pop() + rhs);
-                        }
-                        else
-                        {
-                            valueStack.Push(valueStack.Pop() - rhs);
-                        }
+                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
+
+                        //if (poppedOperator == "+")
+                        //{
+                        //    valueStack.Push(valueStack.Pop() + rhs);
+                        //}
+                        //else
+                        //{
+                        //    valueStack.Push(valueStack.Pop() - rhs);
+                        //}
                     }
 
                     operatorStack.Push(token);
@@ -208,20 +212,21 @@ namespace Formulas
                 }
                 else if (token == ")")
                 {
-                    // TODO copied code from above, bad!
                     if (operatorStack.Count > 0 && (operatorStack.Peek() == "+" || operatorStack.Peek() == "-"))
                     {
                         string poppedOperator = operatorStack.Pop();
                         double rhs = valueStack.Pop();
 
-                        if (poppedOperator == "+")
-                        {
-                            valueStack.Push(valueStack.Pop() + rhs);
-                        }
-                        else
-                        {
-                            valueStack.Push(valueStack.Pop() - rhs);
-                        }
+                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
+
+                        //if (poppedOperator == "+")
+                        //{
+                        //    valueStack.Push(valueStack.Pop() + rhs);
+                        //}
+                        //else
+                        //{
+                        //    valueStack.Push(valueStack.Pop() - rhs);
+                        //}
                     }
 
                     operatorStack.Pop(); // value should be "("
@@ -231,18 +236,20 @@ namespace Formulas
                         string poppedOperator = operatorStack.Pop();
                         double rhs = valueStack.Pop();
 
-                        if (poppedOperator == "*")
-                        {
-                            valueStack.Push(valueStack.Pop() * rhs);
-                        }
-                        else
-                        {
-                            if (rhs == 0)
-                            {
-                                throw new FormulaEvaluationException("Divide by zero");
-                            }
-                            valueStack.Push(valueStack.Pop() / rhs);
-                        }
+                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
+
+                        //if (poppedOperator == "*")
+                        //{
+                        //    valueStack.Push(valueStack.Pop() * rhs);
+                        //}
+                        //else
+                        //{
+                        //    if (rhs == 0)
+                        //    {
+                        //        throw new FormulaEvaluationException("Divide by zero");
+                        //    }
+                        //    valueStack.Push(valueStack.Pop() / rhs);
+                        //}
                     }
                 }
 
@@ -254,30 +261,32 @@ namespace Formulas
             }
             else
             {
-                string oper = operatorStack.Pop();
+                string poppedOperator = operatorStack.Pop();
                 double rhs = valueStack.Pop();
 
-                if (oper == "+")
-                {
-                    return valueStack.Pop() + rhs;
-                }
-                else if (oper == "-")
-                {
-                    return valueStack.Pop() - rhs;
-                }
-                else if (oper == "*")
-                {
-                    return valueStack.Pop() * rhs;
-                }
-                else
-                {
-                    if (rhs == 0)
-                    {
-                        throw new FormulaEvaluationException("Divide by zero");
-                    }
-                    return valueStack.Pop() / rhs;
-                }
-                
+                return PerformOperation(valueStack.Pop(), rhs, poppedOperator);
+
+                //if (oper == "+")
+                //{
+                //    return valueStack.Pop() + rhs;
+                //}
+                //else if (oper == "-")
+                //{
+                //    return valueStack.Pop() - rhs;
+                //}
+                //else if (oper == "*")
+                //{
+                //    return valueStack.Pop() * rhs;
+                //}
+                //else
+                //{
+                //    if (rhs == 0)
+                //    {
+                //        throw new FormulaEvaluationException("Divide by zero");
+                //    }
+                //    return valueStack.Pop() / rhs;
+                //}
+
             }
         }
 
@@ -411,6 +420,35 @@ namespace Formulas
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Performs the given binary operation of the form (lhs)(oper)(rhs).
+        /// oper is expected to be +, -, *, or /
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="oper"></param>
+        /// <returns></returns>
+        private double PerformOperation(double lhs, double rhs, string oper)
+        {
+            switch (oper)
+            {
+                case "+":
+                    return lhs + rhs;
+                case "-":
+                    return lhs - rhs;
+                case "*":
+                    return lhs * rhs;
+                case "/":
+                    if (rhs == 0)
+                    {
+                        throw new FormulaEvaluationException("Divide by zero");
+                    }
+                    return lhs / rhs;
+                default:
+                    throw new FormulaEvaluationException("Unsupported operation");
+            }
         }
         
     }
