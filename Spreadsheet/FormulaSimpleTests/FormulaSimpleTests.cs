@@ -48,6 +48,76 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// First token is wrong.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct4()
+        {
+            Formula f = new Formula(")11+11)");
+        }
+
+        /// <summary>
+        /// Excess close parentheses.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct5()
+        {
+            Formula f = new Formula("(11 + 11)) * (2 + 3)");
+        }
+
+        /// <summary>
+        /// Bad token after "("
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct6()
+        {
+            Formula f = new Formula("()5 + 2)");
+        }
+
+        /// <summary>
+        /// Bad token after "("
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct7()
+        {
+            Formula f = new Formula("(5)(2)");
+        }
+
+        /// <summary>
+        /// Empty formula
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct8()
+        {
+            Formula f = new Formula("");
+        }
+
+        /// <summary>
+        /// Another empty formula
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct9()
+        {
+            Formula f = new Formula("     ");
+        }
+
+        /// <summary>
+        /// Unsupported operation
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct10()
+        {
+            Formula f = new Formula("(2 + 9)^2");
+        }
+
+        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
@@ -102,10 +172,42 @@ namespace FormulaTestCases
         /// This uses one of each kind of token.
         /// </summary>
         [TestMethod]
-        public void Evaluate5 ()
+        public void Evaluate5()
         {
             Formula f = new Formula("(x + y) * (z / x) * 1.0");
             Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
+        }
+
+        /// <summary>
+        /// Test for FormulaEvaluationException if formula contains an undefined
+        /// variable.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaEvaluationException))]
+        public void Evaluate6()
+        {
+            Formula f = new Formula("x / a");
+            f.Evaluate(Lookup4);
+        }
+
+        /// <summary>
+        /// Trivial formula
+        /// </summary>
+        [TestMethod]
+        public void Evaluate7()
+        {
+            Formula f = new Formula("11");
+            Assert.AreEqual(f.Evaluate(Lookup4), 11.0, 1e-6);
+        }
+
+        /// <summary>
+        /// Trivial variable formula
+        /// </summary>
+        [TestMethod]
+        public void Evaluate8()
+        {
+            Formula f = new Formula("x");
+            Assert.AreEqual(f.Evaluate(Lookup4), 4.0, 1e-6);
         }
 
         /// <summary>
