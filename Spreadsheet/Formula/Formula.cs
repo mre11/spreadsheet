@@ -142,13 +142,13 @@ namespace Formulas
 
             foreach (string token in GetTokens(formulaString))
             {
-                double currentValue = -1; // TODO hack...
+                double tokenValue = -1; // Need to initialize here, but it will be changed to the variable or token value.
 
                 if (IsVariableToken(token))
                 {
                     try
                     {
-                        currentValue = lookup(token);
+                        tokenValue = lookup(token);
                     }
                     catch (UndefinedVariableException)
                     {
@@ -156,20 +156,14 @@ namespace Formulas
                     }
                 }
 
-                if (IsVariableToken(token) || double.TryParse(token, out currentValue))
+                if (IsVariableToken(token) || double.TryParse(token, out tokenValue))
                 {
+                    valueStack.Push(tokenValue);
+
                     if (operatorStack.Count > 0 && (operatorStack.Peek() == "*" || operatorStack.Peek() == "/"))
                     {
-                        string poppedOperator = operatorStack.Pop();
-                        double poppedValue = valueStack.Pop();
-
-                        valueStack.Push(PerformOperation(poppedValue, currentValue, poppedOperator));
+                        PushNewValue(valueStack, operatorStack);
                     }
-                    else
-                    {
-                        valueStack.Push(currentValue);
-                    }
-
                 }
                 else if (token == "+" || token == "-")
                 {
@@ -198,13 +192,13 @@ namespace Formulas
                         PushNewValue(valueStack, operatorStack);
                     }
                 }
-
             }
 
             if (operatorStack.Count != 0)
             {
                 PushNewValue(valueStack, operatorStack);
             }
+
             return valueStack.Pop();
         }
 
