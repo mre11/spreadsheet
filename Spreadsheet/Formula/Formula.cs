@@ -164,20 +164,6 @@ namespace Formulas
                         double poppedValue = valueStack.Pop();
 
                         valueStack.Push(PerformOperation(poppedValue, currentValue, poppedOperator));
-
-                        //if (poppedOperator == "*")
-                        //{
-                        //    valueStack.Push(poppedValue * currentValue);
-                        //}
-                        //else
-                        //{
-                        //    if (currentValue == 0)
-                        //    {
-                        //        throw new FormulaEvaluationException("Divide by zero");
-                        //    }
-                        //    valueStack.Push(poppedValue / currentValue);
-                        //}
-
                     }
                     else
                     {
@@ -189,19 +175,7 @@ namespace Formulas
                 {
                     if (operatorStack.Count > 0 && (operatorStack.Peek() == "+" || operatorStack.Peek() == "-"))
                     {
-                        string poppedOperator = operatorStack.Pop();
-                        double rhs = valueStack.Pop();
-
-                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
-
-                        //if (poppedOperator == "+")
-                        //{
-                        //    valueStack.Push(valueStack.Pop() + rhs);
-                        //}
-                        //else
-                        //{
-                        //    valueStack.Push(valueStack.Pop() - rhs);
-                        //}
+                        PushNewValue(valueStack, operatorStack);
                     }
 
                     operatorStack.Push(token);
@@ -214,80 +188,24 @@ namespace Formulas
                 {
                     if (operatorStack.Count > 0 && (operatorStack.Peek() == "+" || operatorStack.Peek() == "-"))
                     {
-                        string poppedOperator = operatorStack.Pop();
-                        double rhs = valueStack.Pop();
-
-                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
-
-                        //if (poppedOperator == "+")
-                        //{
-                        //    valueStack.Push(valueStack.Pop() + rhs);
-                        //}
-                        //else
-                        //{
-                        //    valueStack.Push(valueStack.Pop() - rhs);
-                        //}
+                        PushNewValue(valueStack, operatorStack);
                     }
 
                     operatorStack.Pop(); // value should be "("
 
                     if (operatorStack.Count > 0 && (operatorStack.Peek() == "*" || operatorStack.Peek() == "/"))
                     {
-                        string poppedOperator = operatorStack.Pop();
-                        double rhs = valueStack.Pop();
-
-                        valueStack.Push(PerformOperation(valueStack.Pop(), rhs, poppedOperator));
-
-                        //if (poppedOperator == "*")
-                        //{
-                        //    valueStack.Push(valueStack.Pop() * rhs);
-                        //}
-                        //else
-                        //{
-                        //    if (rhs == 0)
-                        //    {
-                        //        throw new FormulaEvaluationException("Divide by zero");
-                        //    }
-                        //    valueStack.Push(valueStack.Pop() / rhs);
-                        //}
+                        PushNewValue(valueStack, operatorStack);
                     }
                 }
 
             }
 
-            if (operatorStack.Count == 0)
+            if (operatorStack.Count != 0)
             {
-                return valueStack.Pop();
+                PushNewValue(valueStack, operatorStack);
             }
-            else
-            {
-                string poppedOperator = operatorStack.Pop();
-                double rhs = valueStack.Pop();
-
-                return PerformOperation(valueStack.Pop(), rhs, poppedOperator);
-
-                //if (oper == "+")
-                //{
-                //    return valueStack.Pop() + rhs;
-                //}
-                //else if (oper == "-")
-                //{
-                //    return valueStack.Pop() - rhs;
-                //}
-                //else if (oper == "*")
-                //{
-                //    return valueStack.Pop() * rhs;
-                //}
-                //else
-                //{
-                //    if (rhs == 0)
-                //    {
-                //        throw new FormulaEvaluationException("Divide by zero");
-                //    }
-                //    return valueStack.Pop() / rhs;
-                //}
-
-            }
+            return valueStack.Pop();
         }
 
         /// <summary>
@@ -449,6 +367,21 @@ namespace Formulas
                 default:
                     throw new FormulaEvaluationException("Unsupported operation");
             }
+        }
+
+        /// <summary>
+        /// Pops two values from the values stack, one operation from the opers stack,
+        /// performs the operation on the values, and pushes the result onto the values
+        /// stack.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="opers"></param>
+        private void PushNewValue(Stack<double> values, Stack<string> opers)
+        {
+            string poppedOperator = opers.Pop();
+            double rhs = values.Pop();
+
+            values.Push(PerformOperation(values.Pop(), rhs, poppedOperator));
         }
         
     }
