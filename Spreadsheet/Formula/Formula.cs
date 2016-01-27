@@ -18,7 +18,9 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
-        // Represents the formula as a string
+        /// <summary>
+        /// Represents the Formula as a string
+        /// </summary>
         private string formulaString;
 
         /// <summary>
