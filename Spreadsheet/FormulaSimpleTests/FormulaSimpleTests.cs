@@ -126,7 +126,7 @@ namespace FormulaTestCases
         [TestMethod]
         public void Evaluate1()
         {
-            Formula f = new Formula("2+3");
+            Formula f = new Formula("2+1+1+2-1");
             Assert.AreEqual(f.Evaluate(v => 0), 5.0, 1e-6);
         }
 
@@ -208,6 +208,17 @@ namespace FormulaTestCases
         {
             Formula f = new Formula("x");
             Assert.AreEqual(f.Evaluate(Lookup4), 4.0, 1e-6);
+        }
+
+        /// <summary>
+        /// Test for FormulaEvaluationException if divide by zero.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaEvaluationException))]
+        public void Evaluate9()
+        {
+            Formula f = new Formula("(2+1)/0");
+            f.Evaluate(Lookup4);
         }
 
         /// <summary>
