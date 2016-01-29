@@ -1,4 +1,7 @@
 ﻿// Written by Joe Zachary for CS 3500, January 2016.
+// Repaired error in Evaluate5.  Added TestMethod Attribute
+//    for Evaluate4 and Evaluate5 - JLZ January 25, 2016
+// Corrected comment for Evaluate3 - JLZ January 29, 2016
 // Modified by Morgan Empey (u0634576) for CS 3500, Spring 2016, University of Utah
 
 using System;
@@ -145,7 +148,7 @@ namespace FormulaTestCases
 
         /// <summary>
         /// Here, the delegate passed to Evaluate always throws a
-        /// FormulaEvaluationException (meaning that no variables have
+        /// UndefinedVariableException (meaning that no variables have
         /// values).  The test case checks that the result of
         /// evaluating the Formula is a FormulaEvaluationException.
         /// </summary>
@@ -172,7 +175,7 @@ namespace FormulaTestCases
         /// This uses one of each kind of token.
         /// </summary>
         [TestMethod]
-        public void Evaluate5()
+        public void Evaluate5 ()
         {
             Formula f = new Formula("(x + y) * (z / x) * 1.0");
             Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
