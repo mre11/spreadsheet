@@ -2,7 +2,6 @@
 // Revised for CS 3500 by Joe Zachary, January 29, 2016
 // Modified for CS 3500 by Morgan Empey, University of Utah, Spring 2016
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -1,6 +1,5 @@
 ﻿// Written by Morgan Empey for CS 3500, University of Utah, Spring 2016
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dependencies;
 using System.Linq;
