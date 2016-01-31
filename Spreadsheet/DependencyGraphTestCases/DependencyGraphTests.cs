@@ -4,6 +4,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dependencies;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace DependencyGraphTestCases
 {
@@ -25,6 +26,7 @@ namespace DependencyGraphTestCases
 
         /// <summary>
         /// Tests Size when dg is small.
+        /// Also tests AddDependency.
         /// </summary>
         [TestMethod]
         public void TestSize2()
@@ -37,6 +39,7 @@ namespace DependencyGraphTestCases
 
         /// <summary>
         /// Tests Size when dg is moderately sized.
+        /// Also tests AddDependency.
         /// </summary>
         [TestMethod]
         public void TestSize3()
@@ -53,6 +56,7 @@ namespace DependencyGraphTestCases
 
         /// <summary>
         /// Tests Size when dg is large.
+        /// Also tests AddDependency.
         /// </summary>
         [TestMethod]
         public void TestSize4()
@@ -64,7 +68,7 @@ namespace DependencyGraphTestCases
                 dg.AddDependency("a" + i, "b" + i);
             }
 
-            Assert.AreEqual(1000, dg.Size);
+            Assert.AreEqual(100000, dg.Size);
         }
 
         /// <summary>
@@ -76,7 +80,7 @@ namespace DependencyGraphTestCases
             var dg = new DependencyGraph();
             dg.AddDependency("a", "b");
             Assert.IsTrue(dg.HasDependents("a"));
-            Assert.IsFalse(dg.HasDependents("b"));            
+            Assert.IsFalse(dg.HasDependents("b"));
         }
 
         /// <summary>
@@ -113,31 +117,10 @@ namespace DependencyGraphTestCases
             dg.AddDependency("1", "3");
             dg.AddDependency("1", "4");
 
-            var count = 2;
-            foreach (string s in dg.GetDependents("1"))
-            {
-                Assert.AreEqual(count++ + "", s);
-            }
-        }
-
-        /// <summary>
-        /// Tests GetDependents when there are many.
-        /// </summary>
-        [TestMethod]
-        public void TestGetDependents3()
-        {
-            var dg = new DependencyGraph();
-
-            for (var i = 0; i < 10000; i++)
-            {
-                dg.AddDependency("1", i + 1 + "");
-            }
-
-            var num = 2;
-            foreach (string s in dg.GetDependents("1"))
-            {
-                Assert.AreEqual(num++ + "", s);
-            }
+            var list = dg.GetDependents("1").ToList<string>();
+            Assert.IsTrue(list.Contains("2"));
+            Assert.IsTrue(list.Contains("3"));
+            Assert.IsTrue(list.Contains("4"));
         }
 
         /// <summary>
@@ -162,31 +145,170 @@ namespace DependencyGraphTestCases
             dg.AddDependency("3", "1");
             dg.AddDependency("4", "1");
 
-            var count = 2;
-            foreach (string s in dg.GetDependees("1"))
-            {
-                Assert.AreEqual(count++ + "", s);
-            }
+            var list = dg.GetDependees("1").ToList<string>();
+            Assert.IsTrue(list.Contains("2"));
+            Assert.IsTrue(list.Contains("3"));
+            Assert.IsTrue(list.Contains("4"));
         }
 
         /// <summary>
-        /// Tests GetDependents when there are many.
+        /// Tests AddDependency for multple adds of the same
+        /// dependency.
         /// </summary>
         [TestMethod]
-        public void TestGetDependees3()
+        public void TestAddDependency1()
         {
             var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("2", "1");
+            dg.AddDependency("2", "1");
 
-            for (var i = 0; i < 10000; i++)
-            {
-                dg.AddDependency( i + 1 + "", "1");
-            }
+            Assert.AreEqual(1, dg.Size);
+        }
 
-            var num = 2;
-            foreach (string s in dg.GetDependees("1"))
-            {
-                Assert.AreEqual(num++ + "", s);
-            }
+        /// <summary>
+        /// Tests RemoveDependency when the dependent is not found.
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependency1()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+
+            dg.RemoveDependency("5", "1");
+
+            Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests RemoveDependency when the dependee is not found.
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependency2()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+
+            dg.RemoveDependency("2", "3");
+
+            Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests RemoveDependency when the dependency exists.
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependency3()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+
+            dg.RemoveDependency("2", "1");
+
+            Assert.AreEqual(2, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests multiple RemoveDependency calls.
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependency4()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+            dg.AddDependency("5", "1");
+
+            dg.RemoveDependency("2", "1");
+            dg.RemoveDependency("3", "1");
+            dg.RemoveDependency("4", "1");
+
+            Assert.AreEqual(1, dg.Size);
+        }
+
+        /// <summary>
+        /// Test ReplaceDependents with no replacements.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependents1()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("2", "3");
+            dg.AddDependency("2", "4");
+            dg.AddDependency("2", "5");
+
+            dg.ReplaceDependents("2", new List<string>());
+
+            Assert.AreEqual(0, dg.Size);
+        }
+
+        /// <summary>
+        /// Test ReplaceDependents with replacements.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependents2()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("2", "3");
+            dg.AddDependency("2", "4");
+            dg.AddDependency("2", "5");
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependents("2", list);
+
+            Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Test ReplaceDependees with no replacements.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependees1()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+            dg.AddDependency("5", "1");
+
+            dg.ReplaceDependees("1", new List<string>());
+
+            Assert.AreEqual(0, dg.Size);
+        }
+
+        /// <summary>
+        /// Test ReplaceDependees with replacements.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependees2()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("3", "1");
+            dg.AddDependency("4", "1");
+            dg.AddDependency("5", "1");
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependees("1", list);
+
+            Assert.AreEqual(3, dg.Size);
         }
     }
 }
