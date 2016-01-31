@@ -51,10 +51,10 @@ namespace Dependencies
     public class DependencyGraph
     {
         /// <summary>
-        /// Represents the graph as a HashSet of vertices.  Each Vertex
-        /// maintains references to its dependents and dependees.
+        /// Represents the graph as a Dictionary of vertices, where the key is the name of the Vertex.
+        /// Each Vertex maintains references to its dependents and dependees.
         /// </summary>
-        private HashSet<Vertex> cells;
+        private Dictionary<string, Vertex> cells;
 
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
@@ -148,30 +148,32 @@ namespace Dependencies
             /// <summary>
             /// The unique name of this Vertex.
             /// </summary>
-            string _key;
+            string key;
 
             /// <summary>
             /// The size of a Vertex is the number of its dependents.
             /// </summary>
-            int _size;
+            int size;
 
             /// <summary>
             /// Lists all dependents of this Vertex.
             /// </summary>
-            HashSet<Vertex> _dependents;
+            HashSet<Vertex> dependents;
 
             /// <summary>
             /// Lists all dependees of this Vertex.
             /// </summary>
-            HashSet<Vertex> _dependees;
+            HashSet<Vertex> dependees;
 
             /// <summary>
             /// Constructs a new Vertex object with no dependents or dependees.
             /// </summary>
             Vertex(string name)
             {
-                _key = name;
-                _size = 0;
+                key = name;
+                size = 0;
+                dependents = new HashSet<Vertex>();
+                dependees = new HashSet<Vertex>();
             }
 
             /// <summary>
@@ -180,7 +182,9 @@ namespace Dependencies
             /// </summary>
             Vertex(string name, IEnumerable<Vertex> dependents, IEnumerable<Vertex> dependees)
                 : this(name)
-            {                
+            {
+                this.AddDependents(dependents);
+                this.AddDependees(dependees);             
             }
 
             /// <summary>
@@ -188,7 +192,7 @@ namespace Dependencies
             /// </summary>
             string Name
             {
-                get { return _key; }
+                get { return key; }
             }
 
             /// <summary>
@@ -196,7 +200,7 @@ namespace Dependencies
             /// </summary>
             int Size
             {
-                get { return _size; }
+                get { return size; }
             }
 
             /// <summary>
@@ -204,7 +208,10 @@ namespace Dependencies
             /// </summary>
             IEnumerable<Vertex> GetAllDependents()
             {
-                return null;
+                foreach (Vertex v in this.dependents)
+                {
+                    yield return v;
+                }
             }
 
             /// <summary>
@@ -212,7 +219,10 @@ namespace Dependencies
             /// </summary>
             IEnumerable<Vertex> GetAllDependees()
             {
-                return null;
+                foreach (Vertex v in this.dependees)
+                {
+                    yield return v;
+                }
             }
 
             /// <summary>
@@ -220,7 +230,10 @@ namespace Dependencies
             /// </summary>
             void AddDependent(Vertex vertex)
             {
-
+                if (dependents.Add(vertex))
+                {
+                    size++;
+                }
             }
 
             /// <summary>
@@ -228,7 +241,10 @@ namespace Dependencies
             /// </summary>
             void AddDependents(IEnumerable<Vertex> vertices)
             {
-
+                foreach (Vertex v in vertices)
+                {
+                    this.AddDependent(v);
+                }
             }
 
             /// <summary>
@@ -236,7 +252,7 @@ namespace Dependencies
             /// </summary>
             void AddDependee(Vertex vertex)
             {
-
+                dependees.Add(vertex);
             }
 
             /// <summary>
@@ -244,7 +260,10 @@ namespace Dependencies
             /// </summary>
             void AddDependees(IEnumerable<Vertex> vertices)
             {
-
+                foreach (Vertex v in vertices)
+                {
+                    this.AddDependee(v);
+                }
             }
 
             /// <summary>
@@ -252,16 +271,17 @@ namespace Dependencies
             /// </summary>
             void RemoveDependent(Vertex vertex)
             {
-
+                dependents.Remove(vertex);
+                size--;
             }
 
             /// <summary>
             /// Removes all dependents from this vertex.
             /// </summary>
-            /// <param name="vertices"></param>
             void RemoveAllDependents()
             {
-
+                dependents = new HashSet<Vertex>();
+                size = 0;
             }
 
             /// <summary>
@@ -269,7 +289,7 @@ namespace Dependencies
             /// </summary>
             void RemoveDependee(Vertex vertex)
             {
-
+                dependees.Remove(vertex);
             }
 
             /// <summary>
@@ -277,7 +297,15 @@ namespace Dependencies
             /// </summary>
             void RemoveAllDependees()
             {
+                dependees = new HashSet<Vertex>();
+            }
 
+            /// <summary>
+            /// The hash code of a Vertex is the hash code of its Name.
+            /// </summary>
+            public override int GetHashCode()
+            {
+                return key.GetHashCode();
             }
         }
     }
