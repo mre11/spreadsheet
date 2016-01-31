@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dependencies
 {
@@ -61,6 +62,7 @@ namespace Dependencies
         /// </summary>
         public DependencyGraph()
         {
+            cells = new Dictionary<string, Vertex>();
         }
 
         /// <summary>
@@ -68,7 +70,15 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get
+            {
+                var count = 0;
+                foreach (KeyValuePair<string, Vertex> pair in cells)
+                {
+                    count += pair.Value.Size;
+                }
+                return count;
+            }
         }
 
         /// <summary>
@@ -76,6 +86,16 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+            Vertex v;
+
+            if (cells.TryGetValue(s, out v))
+            {
+                if (v.GetAllDependents().Any())
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -84,6 +104,16 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
+            Vertex v;
+
+            if (cells.TryGetValue(s, out v))
+            {
+                if (v.GetAllDependees().Any())
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -92,7 +122,15 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            Vertex v;
+
+            if (cells.TryGetValue(s, out v))
+            {
+                foreach (string name in v.GetAllDependentsNames())
+                {
+                    yield return name;
+                }
+            }
         }
 
         /// <summary>
@@ -100,7 +138,15 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            Vertex v;
+
+            if (cells.TryGetValue(s, out v))
+            {
+                foreach (string name in v.GetAllDependeesNames())
+                {
+                    yield return name;
+                }
+            }
         }
 
         /// <summary>
@@ -110,6 +156,23 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            Vertex left;
+            Vertex right;
+            
+            // If a vertex doesn't exist, add it.
+            if (!cells.TryGetValue(s, out left))
+            {
+                cells.Add(s, left = new Vertex(s));
+            }
+
+            if (!cells.TryGetValue(t, out right))
+            {
+                cells.Add(t, right = new Vertex(t));
+            }
+
+            // Add the dependency
+            left.AddDependent(right);
+            right.AddDependee(left);
         }
 
         /// <summary>
@@ -119,6 +182,18 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            Vertex left;
+            Vertex right;
+
+            // If either vertex doesn't exist, there's nothing to remove
+            if (!cells.TryGetValue(s, out left) || !cells.TryGetValue(t, out right))
+            {
+                return;
+            }
+
+            // Remove the dependency
+            left.RemoveDependent(right);
+            right.RemoveDependee(left);
         }
 
         /// <summary>
@@ -128,6 +203,19 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            Vertex left;
+
+            if (!cells.TryGetValue(s, out left))
+            {
+                cells.Add(s, left = new Vertex(s));
+            }
+
+            left.RemoveAllDependents();
+
+            foreach (string name in newDependents)
+            {
+                left.AddDependent(new Vertex(name));
+            }
         }
 
         /// <summary>
@@ -137,6 +225,19 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            Vertex right;
+
+            if (!cells.TryGetValue(t, out right))
+            {
+                cells.Add(t, right = new Vertex(t));
+            }
+
+            right.RemoveAllDependees();
+
+            foreach (string name in newDependees)
+            {
+                right.AddDependee(new Vertex(name));
+            }
         }
 
         /// <summary>
@@ -168,7 +269,7 @@ namespace Dependencies
             /// <summary>
             /// Constructs a new Vertex object with no dependents or dependees.
             /// </summary>
-            Vertex(string name)
+            internal Vertex(string name)
             {
                 key = name;
                 size = 0;
@@ -180,7 +281,7 @@ namespace Dependencies
             /// Constructs a new Vertex object with the given name, dependents, and dependees.
             /// Dependents and dependees are allowed to be empty.
             /// </summary>
-            Vertex(string name, IEnumerable<Vertex> dependents, IEnumerable<Vertex> dependees)
+            internal Vertex(string name, IEnumerable<Vertex> dependents, IEnumerable<Vertex> dependees)
                 : this(name)
             {
                 this.AddDependents(dependents);
@@ -190,7 +291,7 @@ namespace Dependencies
             /// <summary>
             /// Returns the name of this Vertex.
             /// </summary>
-            string Name
+            internal string Name
             {
                 get { return key; }
             }
@@ -198,7 +299,7 @@ namespace Dependencies
             /// <summary>
             /// Returns the size of this Vertex.
             /// </summary>
-            int Size
+            internal int Size
             {
                 get { return size; }
             }
@@ -206,7 +307,7 @@ namespace Dependencies
             /// <summary>
             /// Returns all dependents of this Vertex.
             /// </summary>
-            IEnumerable<Vertex> GetAllDependents()
+            internal IEnumerable<Vertex> GetAllDependents()
             {
                 foreach (Vertex v in this.dependents)
                 {
@@ -215,9 +316,20 @@ namespace Dependencies
             }
 
             /// <summary>
+            /// Returns an enumeration of the names of all dependents of this Vertex.
+            /// </summary>
+            internal IEnumerable<string> GetAllDependentsNames()
+            {
+                foreach (Vertex v in this.dependents)
+                {
+                    yield return v.Name;
+                }
+            }
+
+            /// <summary>
             /// Returns all dependees of this Vertex.
             /// </summary>
-            IEnumerable<Vertex> GetAllDependees()
+            internal IEnumerable<Vertex> GetAllDependees()
             {
                 foreach (Vertex v in this.dependees)
                 {
@@ -226,9 +338,20 @@ namespace Dependencies
             }
 
             /// <summary>
-            /// Adds a single dependent to this Vertex.
+            /// Returns an enumeration of the names of all dependees of this Vertex.
             /// </summary>
-            void AddDependent(Vertex vertex)
+            internal IEnumerable<string> GetAllDependeesNames()
+            {
+                foreach (Vertex v in this.dependees)
+                {
+                    yield return v.Name;
+                }
+            }
+
+            /// <summary>
+            /// Adds a single dependent to this Vertex. Does nothing if the dependent already exists.
+            /// </summary>
+            internal void AddDependent(Vertex vertex)
             {
                 if (dependents.Add(vertex))
                 {
@@ -239,7 +362,7 @@ namespace Dependencies
             /// <summary>
             /// Adds multiple dependents to this Vertex.
             /// </summary>
-            void AddDependents(IEnumerable<Vertex> vertices)
+            internal void AddDependents(IEnumerable<Vertex> vertices)
             {
                 foreach (Vertex v in vertices)
                 {
@@ -248,9 +371,9 @@ namespace Dependencies
             }
 
             /// <summary>
-            /// Adds a single dependee to this Vertex.
+            /// Adds a single dependee to this Vertex. Does nothing if the dependee already exists.
             /// </summary>
-            void AddDependee(Vertex vertex)
+            internal void AddDependee(Vertex vertex)
             {
                 dependees.Add(vertex);
             }
@@ -258,7 +381,7 @@ namespace Dependencies
             /// <summary>
             /// Adds multiple dependees to this Vertex.
             /// </summary>
-            void AddDependees(IEnumerable<Vertex> vertices)
+            internal void AddDependees(IEnumerable<Vertex> vertices)
             {
                 foreach (Vertex v in vertices)
                 {
@@ -269,7 +392,7 @@ namespace Dependencies
             /// <summary>
             /// Removes a single dependent from this Vertex.
             /// </summary>
-            void RemoveDependent(Vertex vertex)
+            internal void RemoveDependent(Vertex vertex)
             {
                 dependents.Remove(vertex);
                 size--;
@@ -278,7 +401,7 @@ namespace Dependencies
             /// <summary>
             /// Removes all dependents from this vertex.
             /// </summary>
-            void RemoveAllDependents()
+            internal void RemoveAllDependents()
             {
                 dependents = new HashSet<Vertex>();
                 size = 0;
@@ -287,7 +410,7 @@ namespace Dependencies
             /// <summary>
             /// Removes a single dependee from this Vertex.
             /// </summary>
-            void RemoveDependee(Vertex vertex)
+            internal void RemoveDependee(Vertex vertex)
             {
                 dependees.Remove(vertex);
             }
@@ -295,7 +418,7 @@ namespace Dependencies
             /// <summary>
             /// Removes all dependees from this Vertex.
             /// </summary>
-            void RemoveAllDependees()
+            internal void RemoveAllDependees()
             {
                 dependees = new HashSet<Vertex>();
             }
