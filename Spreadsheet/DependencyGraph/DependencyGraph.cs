@@ -132,5 +132,43 @@ namespace Dependencies
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
         }
+
+        /// <summary>
+        /// Provides a representation of a single vertex of a DependencyGraph.
+        /// A Vertex knows all its dependents and dependees.
+        /// </summary>
+        private class Vertex
+        {
+            /// <summary>
+            /// The unique name of this Vertex.
+            /// </summary>
+            string key;
+
+            /// <summary>
+            /// The size of a Vertex is the number of its dependents.
+            /// </summary>
+            int size;
+
+            /// <summary>
+            /// Lists all dependents of this Vertex.
+            /// </summary>
+            IEnumerable<Vertex> dependents;
+
+            /// <summary>
+            /// Lists all dependees of this Vertex.
+            /// </summary>
+            IEnumerable<Vertex> dependees;
+
+            /// <summary>
+            /// Constructs a new Vertex object with no dependents or dependees.
+            /// </summary>
+            private Vertex(string name)
+            {
+                key = name;
+            }
+
+        }
     }
+
+
 }
