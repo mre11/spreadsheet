@@ -51,6 +51,12 @@ namespace Dependencies
     public class DependencyGraph
     {
         /// <summary>
+        /// Represents the graph as a HashSet of vertices.  Each Vertex
+        /// maintains references to its dependents and dependees.
+        /// </summary>
+        private HashSet<Vertex> cells;
+
+        /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
@@ -142,33 +148,137 @@ namespace Dependencies
             /// <summary>
             /// The unique name of this Vertex.
             /// </summary>
-            string key;
+            string _key;
 
             /// <summary>
             /// The size of a Vertex is the number of its dependents.
             /// </summary>
-            int size;
+            int _size;
 
             /// <summary>
             /// Lists all dependents of this Vertex.
             /// </summary>
-            IEnumerable<Vertex> dependents;
+            HashSet<Vertex> _dependents;
 
             /// <summary>
             /// Lists all dependees of this Vertex.
             /// </summary>
-            IEnumerable<Vertex> dependees;
+            HashSet<Vertex> _dependees;
 
             /// <summary>
             /// Constructs a new Vertex object with no dependents or dependees.
             /// </summary>
-            private Vertex(string name)
+            Vertex(string name)
             {
-                key = name;
+                _key = name;
+                _size = 0;
             }
 
+            /// <summary>
+            /// Constructs a new Vertex object with the given name, dependents, and dependees.
+            /// Dependents and dependees are allowed to be empty.
+            /// </summary>
+            Vertex(string name, IEnumerable<Vertex> dependents, IEnumerable<Vertex> dependees)
+                : this(name)
+            {                
+            }
+
+            /// <summary>
+            /// Returns the name of this Vertex.
+            /// </summary>
+            string Name
+            {
+                get { return _key; }
+            }
+
+            /// <summary>
+            /// Returns the size of this Vertex.
+            /// </summary>
+            int Size
+            {
+                get { return _size; }
+            }
+
+            /// <summary>
+            /// Returns all dependents of this Vertex.
+            /// </summary>
+            IEnumerable<Vertex> GetAllDependents()
+            {
+                return null;
+            }
+
+            /// <summary>
+            /// Returns all dependees of this Vertex.
+            /// </summary>
+            IEnumerable<Vertex> GetAllDependees()
+            {
+                return null;
+            }
+
+            /// <summary>
+            /// Adds a single dependent to this Vertex.
+            /// </summary>
+            void AddDependent(Vertex vertex)
+            {
+
+            }
+
+            /// <summary>
+            /// Adds multiple dependents to this Vertex.
+            /// </summary>
+            void AddDependents(IEnumerable<Vertex> vertices)
+            {
+
+            }
+
+            /// <summary>
+            /// Adds a single dependee to this Vertex.
+            /// </summary>
+            void AddDependee(Vertex vertex)
+            {
+
+            }
+
+            /// <summary>
+            /// Adds multiple dependees to this Vertex.
+            /// </summary>
+            void AddDependees(IEnumerable<Vertex> vertices)
+            {
+
+            }
+
+            /// <summary>
+            /// Removes a single dependent from this Vertex.
+            /// </summary>
+            void RemoveDependent(Vertex vertex)
+            {
+
+            }
+
+            /// <summary>
+            /// Removes all dependents from this vertex.
+            /// </summary>
+            /// <param name="vertices"></param>
+            void RemoveAllDependents()
+            {
+
+            }
+
+            /// <summary>
+            /// Removes a single dependee from this Vertex.
+            /// </summary>
+            void RemoveDependee(Vertex vertex)
+            {
+
+            }
+
+            /// <summary>
+            /// Removes all dependees from this Vertex.
+            /// </summary>
+            void RemoveAllDependees()
+            {
+
+            }
         }
     }
-
-
 }
