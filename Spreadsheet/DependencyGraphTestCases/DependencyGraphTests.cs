@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dependencies;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace DependencyGraphTestCases
 {
@@ -308,6 +309,32 @@ namespace DependencyGraphTestCases
             dg.ReplaceDependees("1", list);
 
             Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests DependencyGraph performance by adding one million randomly-generated dependencies.
+        /// </summary>
+        [TestMethod]
+        public void TestPerformance1()
+        {
+            var dg = new DependencyGraph();
+            var cellNumberUpperBound = 1000;
+            var random = new Random();
+
+            for (var i = 0; i < 1000000; i++)
+            {
+                dg.AddDependency(GenerateRandomIntString(cellNumberUpperBound, random), GenerateRandomIntString(cellNumberUpperBound, random));
+            }
+
+            Assert.IsTrue(dg.Size > 0);
+        }
+
+        /// <summary>
+        /// Returns a random string representing an in between 0 and upperBound.
+        /// </summary>
+        private string GenerateRandomIntString(int upperBound, Random random)
+        {
+            return "" + random.Next(upperBound);
         }
     }
 }
