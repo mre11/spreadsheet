@@ -192,8 +192,8 @@ namespace Dependencies
             }
 
             // Remove the dependency
-            left.RemoveDependent(right);
-            right.RemoveDependee(left);
+            left.RemoveDependent(right.Name);
+            right.RemoveDependee(left.Name);
         }
 
         /// <summary>
@@ -212,9 +212,16 @@ namespace Dependencies
 
             left.RemoveAllDependents();
 
+            // Remove s from the dependees list of each of its dependents
+            foreach (KeyValuePair<string, Vertex> pair in cells)
+            {
+                pair.Value.RemoveDependee(s);
+            }
+
+            // Add the new dependents
             foreach (string name in newDependents)
             {
-                left.AddDependent(new Vertex(name));
+                AddDependency(s, name);
             }
         }
 
@@ -234,9 +241,16 @@ namespace Dependencies
 
             right.RemoveAllDependees();
 
+            // Remove t from the dependents list of each of its dependees
+            foreach (KeyValuePair<string, Vertex> pair in cells)
+            {
+                pair.Value.RemoveDependent(t);
+            }
+
+            // Add the new dependees
             foreach (string name in newDependees)
             {
-                right.AddDependee(new Vertex(name));
+                AddDependency(name, t);
             }
         }
 
@@ -259,12 +273,12 @@ namespace Dependencies
             /// <summary>
             /// Lists all dependents of this Vertex.
             /// </summary>
-            HashSet<Vertex> dependents;
+            Dictionary<string, Vertex> dependents;
 
             /// <summary>
             /// Lists all dependees of this Vertex.
             /// </summary>
-            HashSet<Vertex> dependees;
+            Dictionary<string, Vertex> dependees;
 
             /// <summary>
             /// Constructs a new Vertex object with no dependents or dependees.
@@ -273,8 +287,8 @@ namespace Dependencies
             {
                 key = name;
                 size = 0;
-                dependents = new HashSet<Vertex>();
-                dependees = new HashSet<Vertex>();
+                dependents = new Dictionary<string, Vertex>();
+                dependees = new Dictionary<string, Vertex>();
             }
 
             /// <summary>
@@ -309,9 +323,9 @@ namespace Dependencies
             /// </summary>
             internal IEnumerable<Vertex> GetAllDependents()
             {
-                foreach (Vertex v in this.dependents)
+                foreach (KeyValuePair<string, Vertex> pair in this.dependents)
                 {
-                    yield return v;
+                    yield return pair.Value;
                 }
             }
 
@@ -320,9 +334,9 @@ namespace Dependencies
             /// </summary>
             internal IEnumerable<string> GetAllDependentsNames()
             {
-                foreach (Vertex v in this.dependents)
+                foreach (KeyValuePair<string, Vertex> pair in this.dependents)
                 {
-                    yield return v.Name;
+                    yield return pair.Key;
                 }
             }
 
@@ -331,9 +345,9 @@ namespace Dependencies
             /// </summary>
             internal IEnumerable<Vertex> GetAllDependees()
             {
-                foreach (Vertex v in this.dependees)
+                foreach (KeyValuePair<string, Vertex> pair in this.dependees)
                 {
-                    yield return v;
+                    yield return pair.Value;
                 }
             }
 
@@ -342,9 +356,9 @@ namespace Dependencies
             /// </summary>
             internal IEnumerable<string> GetAllDependeesNames()
             {
-                foreach (Vertex v in this.dependees)
+                foreach (KeyValuePair<string, Vertex> pair in this.dependees)
                 {
-                    yield return v.Name;
+                    yield return pair.Key;
                 }
             }
 
@@ -353,8 +367,11 @@ namespace Dependencies
             /// </summary>
             internal void AddDependent(Vertex vertex)
             {
-                if (dependents.Add(vertex))
+                Vertex dummyVertex;
+
+                if (!dependents.TryGetValue(vertex.Name, out dummyVertex))
                 {
+                    dependents.Add(vertex.Name, vertex);
                     size++;
                 }
             }
@@ -375,7 +392,12 @@ namespace Dependencies
             /// </summary>
             internal void AddDependee(Vertex vertex)
             {
-                dependees.Add(vertex);
+                Vertex dummyVertex;
+
+                if (!dependees.TryGetValue(vertex.Name, out dummyVertex))
+                {
+                    dependees.Add(vertex.Name, vertex);
+                }
             }
 
             /// <summary>
@@ -392,10 +414,12 @@ namespace Dependencies
             /// <summary>
             /// Removes a single dependent from this Vertex.
             /// </summary>
-            internal void RemoveDependent(Vertex vertex)
+            internal void RemoveDependent(string name)
             {
-                dependents.Remove(vertex);
-                size--;
+                if (dependents.Remove(name))
+                {
+                    size--;
+                }
             }
 
             /// <summary>
@@ -403,16 +427,16 @@ namespace Dependencies
             /// </summary>
             internal void RemoveAllDependents()
             {
-                dependents = new HashSet<Vertex>();
+                dependents = new Dictionary<string, Vertex>();
                 size = 0;
             }
 
             /// <summary>
             /// Removes a single dependee from this Vertex.
             /// </summary>
-            internal void RemoveDependee(Vertex vertex)
+            internal void RemoveDependee(string name)
             {
-                dependees.Remove(vertex);
+                dependees.Remove(name);
             }
 
             /// <summary>
@@ -420,7 +444,7 @@ namespace Dependencies
             /// </summary>
             internal void RemoveAllDependees()
             {
-                dependees = new HashSet<Vertex>();
+                dependees = new Dictionary<string, Vertex>();
             }
 
             /// <summary>
