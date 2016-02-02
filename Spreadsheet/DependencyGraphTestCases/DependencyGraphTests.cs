@@ -299,6 +299,28 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Test ReplaceDependents without pre-existing dependents.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependents3()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("2", "1");
+            dg.AddDependency("2", "3");
+            dg.AddDependency("2", "4");
+            dg.AddDependency("2", "5");
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependents("6", list);
+
+            Assert.AreEqual(7, dg.Size);
+        }
+
+        /// <summary>
         /// Test ReplaceDependees with no replacements.
         /// </summary>
         [TestMethod]
@@ -326,6 +348,24 @@ namespace DependencyGraphTestCases
             dg.AddDependency("3", "1");
             dg.AddDependency("4", "1");
             dg.AddDependency("5", "1");
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependees("1", list);
+
+            Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Test ReplaceDependees on an empty DependencyGraph.
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependees3()
+        {
+            var dg = new DependencyGraph();
 
             var list = new List<string>();
             list.Add("a");
