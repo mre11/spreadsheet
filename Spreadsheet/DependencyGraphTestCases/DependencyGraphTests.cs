@@ -34,7 +34,12 @@ namespace DependencyGraphTestCases
             var dg = new DependencyGraph();
             dg.AddDependency("a1", "a2");
             dg.AddDependency("a1", "a3");
-            Assert.AreEqual(2, dg.Size);
+            dg.AddDependency("b1", "a1");
+            dg.AddDependency("a2", "a3");
+            dg.AddDependency("b2", "a2");
+            dg.AddDependency("b2", "a3");
+            dg.AddDependency("a1", "b2");
+            Assert.AreEqual(7, dg.Size);
         }
 
         /// <summary>
@@ -69,6 +74,27 @@ namespace DependencyGraphTestCases
             }
 
             Assert.AreEqual(100000, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests Size after more complex dg operations.
+        /// Also serves as an integration test.
+        /// </summary>
+        [TestMethod]
+        public void TestSize5()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("a1", "a2");
+            dg.AddDependency("a1", "a3");
+            dg.AddDependency("b1", "a1");
+            dg.AddDependency("a2", "a3");
+            dg.AddDependency("b2", "a2");
+            dg.AddDependency("b2", "a3");
+            dg.AddDependency("a1", "b2");
+            dg.ReplaceDependents("b2", new List<string>());
+            dg.RemoveDependency("a2", "a3");
+            dg.RemoveDependency("a1", "a3");
+            Assert.AreEqual(3, dg.Size);
         }
 
         /// <summary>
@@ -312,7 +338,8 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// Tests DependencyGraph performance by adding one million randomly-generated dependencies.
+        /// Tests DependencyGraph performance by adding one million randomly-generated dependencies and
+        /// performing other operations.
         /// </summary>
         [TestMethod]
         public void TestPerformance1()
@@ -326,6 +353,14 @@ namespace DependencyGraphTestCases
                 dg.AddDependency(GenerateRandomIntString(cellNumberUpperBound, random), GenerateRandomIntString(cellNumberUpperBound, random));
             }
 
+            Assert.IsTrue(dg.HasDependents("42"));
+            Assert.IsTrue(dg.HasDependees("11"));
+            dg.ReplaceDependees("42", new List<string>());
+            dg.ReplaceDependents("555", new List<string>());
+            dg.AddDependency("1", "1001");
+            dg.AddDependency("2", "3");
+            dg.RemoveDependency("1", "1001");
+            dg.RemoveDependency("22", "17");
             Assert.IsTrue(dg.Size > 0);
         }
 

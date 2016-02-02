@@ -364,13 +364,11 @@ namespace Dependencies
             /// <summary>
             /// Adds a single dependent to this Vertex. Does nothing if the dependent already exists.
             /// </summary>
-            internal void AddDependent(Vertex vertex)
+            internal void AddDependent(Vertex v)
             {
-                Vertex dummyVertex;
-
-                if (!dependents.TryGetValue(vertex.Name, out dummyVertex))
+                if (!dependents.ContainsKey(v.Name))
                 {
-                    dependents.Add(vertex.Name, vertex);
+                    dependents.Add(v.Name, v);
                     size++;
                 }
             }
@@ -389,13 +387,11 @@ namespace Dependencies
             /// <summary>
             /// Adds a single dependee to this Vertex. Does nothing if the dependee already exists.
             /// </summary>
-            internal void AddDependee(Vertex vertex)
+            internal void AddDependee(Vertex v)
             {
-                Vertex dummyVertex;
-
-                if (!dependees.TryGetValue(vertex.Name, out dummyVertex))
+                if (!dependees.ContainsKey(v.Name))
                 {
-                    dependees.Add(vertex.Name, vertex);
+                    dependees.Add(v.Name, v);
                 }
             }
 
