@@ -54,14 +54,14 @@ namespace Dependencies
         /// Represents the graph as a Dictionary of vertices, where the key is the name of the Vertex.
         /// Each Vertex maintains references to its dependents and dependees.
         /// </summary>
-        private Dictionary<string, Vertex> cells;
+        private Dictionary<string, Vertex> vertices;
 
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
-            cells = new Dictionary<string, Vertex>();
+            vertices = new Dictionary<string, Vertex>();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Dependencies
             get
             {
                 var count = 0;
-                foreach (KeyValuePair<string, Vertex> pair in cells)
+                foreach (KeyValuePair<string, Vertex> pair in vertices)
                 {
                     count += pair.Value.Size;
                 }
@@ -87,7 +87,7 @@ namespace Dependencies
         {
             Vertex v;
 
-            if (cells.TryGetValue(s, out v))
+            if (vertices.TryGetValue(s, out v))
             {
                 if (v.GetAllDependents().Any())
                 {
@@ -105,7 +105,7 @@ namespace Dependencies
         {
             Vertex v;
 
-            if (cells.TryGetValue(s, out v))
+            if (vertices.TryGetValue(s, out v))
             {
                 if (v.GetAllDependees().Any())
                 {
@@ -123,7 +123,7 @@ namespace Dependencies
         {
             Vertex v;
 
-            if (cells.TryGetValue(s, out v))
+            if (vertices.TryGetValue(s, out v))
             {
                 foreach (string name in v.GetAllDependentsNames())
                 {
@@ -139,7 +139,7 @@ namespace Dependencies
         {
             Vertex v;
 
-            if (cells.TryGetValue(s, out v))
+            if (vertices.TryGetValue(s, out v))
             {
                 foreach (string name in v.GetAllDependeesNames())
                 {
@@ -159,14 +159,14 @@ namespace Dependencies
             Vertex right;
             
             // If a vertex doesn't exist, add it.
-            if (!cells.TryGetValue(s, out left))
+            if (!vertices.TryGetValue(s, out left))
             {
-                cells.Add(s, left = new Vertex(s));
+                vertices.Add(s, left = new Vertex(s));
             }
 
-            if (!cells.TryGetValue(t, out right))
+            if (!vertices.TryGetValue(t, out right))
             {
-                cells.Add(t, right = new Vertex(t));
+                vertices.Add(t, right = new Vertex(t));
             }
 
             // Add the dependency
@@ -185,7 +185,7 @@ namespace Dependencies
             Vertex right;
 
             // If either vertex doesn't exist, there's nothing to remove
-            if (!cells.TryGetValue(s, out left) || !cells.TryGetValue(t, out right))
+            if (!vertices.TryGetValue(s, out left) || !vertices.TryGetValue(t, out right))
             {
                 return;
             }
@@ -204,15 +204,15 @@ namespace Dependencies
         {
             Vertex left;
 
-            if (!cells.TryGetValue(s, out left))
+            if (!vertices.TryGetValue(s, out left))
             {
-                cells.Add(s, left = new Vertex(s));
+                vertices.Add(s, left = new Vertex(s));
             }
 
             left.RemoveAllDependents();
 
             // Remove s from the dependees list of each of its dependents
-            foreach (KeyValuePair<string, Vertex> pair in cells)
+            foreach (KeyValuePair<string, Vertex> pair in vertices)
             {
                 pair.Value.RemoveDependee(s);
             }
@@ -233,15 +233,15 @@ namespace Dependencies
         {
             Vertex right;
 
-            if (!cells.TryGetValue(t, out right))
+            if (!vertices.TryGetValue(t, out right))
             {
-                cells.Add(t, right = new Vertex(t));
+                vertices.Add(t, right = new Vertex(t));
             }
 
             right.RemoveAllDependees();
 
             // Remove t from the dependents list of each of its dependees
-            foreach (KeyValuePair<string, Vertex> pair in cells)
+            foreach (KeyValuePair<string, Vertex> pair in vertices)
             {
                 pair.Value.RemoveDependent(t);
             }
@@ -262,22 +262,22 @@ namespace Dependencies
             /// <summary>
             /// The unique name of this Vertex.
             /// </summary>
-            string key;
+            private string key;
 
             /// <summary>
             /// The size of a Vertex is the number of its dependents.
             /// </summary>
-            int size;
+            private int size;
 
             /// <summary>
             /// Lists all dependents of this Vertex.
             /// </summary>
-            Dictionary<string, Vertex> dependents;
+            private Dictionary<string, Vertex> dependents;
 
             /// <summary>
             /// Lists all dependees of this Vertex.
             /// </summary>
-            Dictionary<string, Vertex> dependees;
+            private Dictionary<string, Vertex> dependees;
 
             /// <summary>
             /// Constructs a new Vertex object with no dependents or dependees.
