@@ -16,7 +16,7 @@ namespace Formulas
     /// the four binary operator symbols +, -, *, and /.  (The unary operators + and -
     /// are not allowed.)
     /// </summary>
-    public class Formula
+    public struct Formula
     {
         /// <summary>
         /// Represents the Formula as a string
@@ -129,6 +129,12 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            // The zero-argument constructor sets formulaString to null; it should be set to "0" per specification
+            if (formulaString == null)
+            {
+                formulaString = "0";
+            }
+
             // Create value and operator stacks
             var operatorStack = new Stack<string>();
             var valueStack = new Stack<double>();

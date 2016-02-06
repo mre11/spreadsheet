@@ -121,6 +121,17 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// Tests the behavior of the zero-argument constructor.
+        /// The formula format should be valid, and it should evaluate to 0.
+        /// </summary>
+        [TestMethod]
+        public void ZeroArgumentConstructor1()
+        {
+            Formula f = new Formula();
+            Assert.AreEqual(0, f.Evaluate(v => 1));
+        }
+
+        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
