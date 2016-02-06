@@ -143,6 +143,8 @@ namespace Formulas
         public Formula(string formula, Normalizer normalizer, Validator validator)
             : this(formula)
         {
+            var count = 0;
+
             foreach (string token in formulaTokens)
             {
                 if (IsVariableToken(token))
@@ -159,9 +161,12 @@ namespace Formulas
                     }
                     else
                     {
-                        // replace variable with normalizer(variable) in formula!
+                        // Replace the variable token with its normalized form.
+                        formulaTokens[count] = normalizer(token);
                     }
                 }
+
+                count++;
             }
         }
 
@@ -283,6 +288,29 @@ namespace Formulas
                     yield return s;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns an ISet of every distinct variable in this formula, in normalized form.
+        /// </summary>
+        public ISet<string> GetVariables()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a string representation of this formula
+        /// </summary>
+        public override string ToString()
+        {
+            var result = "";
+
+            foreach (string token in formulaTokens)
+            {
+                result += token;
+            }
+
+            return result;
         }
 
         /// <summary>
