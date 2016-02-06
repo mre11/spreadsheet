@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Formulas
@@ -21,7 +22,7 @@ namespace Formulas
         /// <summary>
         /// Represents the Formula as a string
         /// </summary>
-        private string formulaString;
+        private List<string> formulaTokens;
 
         /// <summary>
         /// Normalizes the variables in this formula in some canonical form.
@@ -56,7 +57,7 @@ namespace Formulas
         public Formula(String formula)
         {
             // Representation of the formula
-            formulaString = formula;
+            formulaTokens = GetTokens(formula).ToList();
 
             // Normalizer is the identity function
             normalizer = (s => s);
@@ -70,7 +71,7 @@ namespace Formulas
             string prevToken = "";
               
             // Check for invalid tokens or syntax
-            foreach (string token in GetTokens(formula))
+            foreach (string token in formulaTokens)
             {
                 tokenCount++;
 
@@ -142,7 +143,7 @@ namespace Formulas
         public Formula(string formula, Normalizer normalizer, Validator validator)
             : this(formula)
         {
-            foreach (string token in GetTokens(formulaString))
+            foreach (string token in formulaTokens)
             {
                 if (IsVariableToken(token))
                 {
@@ -176,16 +177,23 @@ namespace Formulas
         public double Evaluate(Lookup lookup)
         {
             // The zero-argument constructor sets formulaString to null; it should be set to "0" per specification
-            if (formulaString == null)
+            if (formulaTokens == null)
             {
-                formulaString = "0";
+                formulaTokens = new List<string>();
+                formulaTokens.Add("0");
+
+                // Normalizer is the identity function
+                normalizer = (s => s);
+
+                // Validator always returns true
+                validator = (s => true);
             }
 
             // Create value and operator stacks
             var operatorStack = new Stack<string>();
             var valueStack = new Stack<double>();
 
-            foreach (string token in GetTokens(formulaString))
+            foreach (string token in formulaTokens)
             {
                 double tokenValue = -1; // Need to initialize here, but it will be changed to the variable or token value.
 
