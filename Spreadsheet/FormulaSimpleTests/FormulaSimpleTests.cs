@@ -5,6 +5,7 @@
 // Modified by Morgan Empey (u0634576) for CS 3500, Spring 2016, University of Utah
 
 using System;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Formulas;
 
@@ -132,6 +133,46 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// Invalid variable in formula (exception thrown by single-argument constructor)
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ConstructorStringNormVal1()
+        {
+            Formula f = new Formula("1 + 2a", Normalizer2, Validator1);
+        }
+
+        /// <summary>
+        /// Normalizer creates bad variable
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ConstructorStringNormVal2()
+        {
+            Formula f = new Formula("a2", Normalizer2, Validator1);
+        }
+
+        /// <summary>
+        /// Validator rejects variable
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ConstructorStringNormVal3()
+        {
+            Formula f = new Formula("a22", Normalizer1, Validator1);
+        }
+
+        /// <summary>
+        /// Validator rejects variable
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ConstructorStringNormVal4()
+        {
+            Formula f = new Formula("bears", Normalizer1, Validator1);
+        }
+
+        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
@@ -250,6 +291,33 @@ namespace FormulaTestCases
                 case "z": return 8.0;
                 default: throw new UndefinedVariableException(v);
             }
+        }
+
+        /// <summary>
+        /// Returns a s with all letters changed to upper-case.
+        /// </summary>
+        public string Normalizer1(string s)
+        {
+            return s.ToUpper();
+        }
+
+        /// <summary>
+        /// Appends the string "1" to the beginning of s.
+        /// This creates an invalid variable by definition.
+        /// </summary>
+        public string Normalizer2(string s)
+        {
+            return "1" + s;
+        }
+
+        /// <summary>
+        /// Returns true if the string is a single letter followed by a single number
+        /// </summary>
+        public bool Validator1(string variable)
+        {
+            var pattern = @"^[a-zA-Z][0-9]{1}$";
+
+            return Regex.IsMatch(variable, pattern);
         }
     }
 }

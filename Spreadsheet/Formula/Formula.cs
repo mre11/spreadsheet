@@ -24,6 +24,16 @@ namespace Formulas
         private string formulaString;
 
         /// <summary>
+        /// Normalizes the variables in this formula in some canonical form.
+        /// </summary>
+        private Normalizer normalizer;
+
+        /// <summary>
+        /// Imposes extra restrictions of the validity of the variables in this formula.
+        /// </summary>
+        private Validator validator;
+
+        /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
         /// variable symbols (a letter followed by zero or more letters and/or digits), left and right
@@ -47,6 +57,12 @@ namespace Formulas
         {
             // Representation of the formula
             formulaString = formula;
+
+            // Normalizer is the identity function
+            normalizer = (s => s);
+
+            // Validator always returns true
+            validator = (s => true);
 
             int tokenCount = 0;
             int openParenCount = 0;
@@ -116,6 +132,36 @@ namespace Formulas
                 throw new FormulaFormatException("Last token must be a number, variable, or close parentheses");
             }
             
+        }
+
+        /// <summary>
+        /// From the specification by Joe Zachary: "The purpose of a Normalizer is to convert variables
+        /// into a canonical form.  The purpose of a Validator is to impose extra restrictions on the
+        /// validity of a variable, beyond the ones already built into the Formula definition."
+        /// </summary>
+        public Formula(string formula, Normalizer normalizer, Validator validator)
+            : this(formula)
+        {
+            foreach (string token in GetTokens(formulaString))
+            {
+                if (IsVariableToken(token))
+                {
+                    var normalizedToken = normalizer(token);
+
+                    if (!IsVariableToken(normalizedToken))
+                    {
+                        throw new FormulaFormatException("Normalized variable is not legal");
+                    }
+                    else if (!validator(normalizedToken))
+                    {
+                        throw new FormulaFormatException("Validator rejected variable");
+                    }
+                    else
+                    {
+                        // replace variable with normalizer(variable) in formula!
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -387,6 +433,16 @@ namespace Formulas
     /// don't is up to the implementation of the method.
     /// </summary>
     public delegate double Lookup(string s);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate string Normalizer(string s);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate bool Validator(string s);
 
     /// <summary>
     /// Used to report that a Lookup delegate is unable to determine the value
