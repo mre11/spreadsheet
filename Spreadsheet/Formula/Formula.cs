@@ -143,6 +143,7 @@ namespace Formulas
         public Formula(string formula, Normalizer normalizer, Validator validator)
             : this(formula)
         {
+            // TODO write more tests for constructor
             var count = 0;
 
             foreach (string token in formulaTokens)
@@ -295,6 +296,7 @@ namespace Formulas
         /// </summary>
         public ISet<string> GetVariables()
         {
+            // TODO write tests for, and implement, GetVariables
             return null;
         }
 
@@ -303,6 +305,7 @@ namespace Formulas
         /// </summary>
         public override string ToString()
         {
+            // TODO write tests for ToString
             var result = "";
 
             foreach (string token in formulaTokens)
