@@ -277,6 +277,67 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// Test the ToString method.
+        /// </summary>
+        [TestMethod]
+        public void ToString1()
+        {
+            Formula f = new Formula("(x+5)*7/(2-3*y)");
+            Assert.AreEqual("(x+5)*7/(2-3*y)", f.ToString());
+        }
+
+        /// <summary>
+        /// Test GetVariables when there are no variables
+        /// </summary>
+        [TestMethod]
+        public void GetVariables1()
+        {
+            Formula f = new Formula("42");
+            Assert.AreEqual(0, f.GetVariables().Count);
+        }
+
+        /// <summary>
+        /// Test GetVariables when there are no repeat variables
+        /// </summary>
+        [TestMethod]
+        public void GetVariables2()
+        {
+            Formula f = new Formula("x + y + z");
+            Assert.AreEqual(3, f.GetVariables().Count);
+            Assert.IsTrue(f.GetVariables().Contains("x"));
+            Assert.IsTrue(f.GetVariables().Contains("y"));
+            Assert.IsTrue(f.GetVariables().Contains("z"));
+        }
+
+        /// <summary>
+        /// Test GetVariables when there are repeat variables
+        /// </summary>
+        [TestMethod]
+        public void GetVariables3()
+        {
+            Formula f = new Formula("a2 - x + 3*y/y + 2*x + z*z");
+            Assert.AreEqual(4, f.GetVariables().Count);
+            Assert.IsTrue(f.GetVariables().Contains("x"));
+            Assert.IsTrue(f.GetVariables().Contains("y"));
+            Assert.IsTrue(f.GetVariables().Contains("z"));
+            Assert.IsTrue(f.GetVariables().Contains("a2"));
+        }
+
+        /// <summary>
+        /// Test GetVariables when variables are normalized
+        /// </summary>
+        [TestMethod]
+        public void GetVariables4()
+        {
+            Formula f = new Formula("a2 - x + 3*y/y + 2*x + z*z", Normalizer1, s => true);
+            Assert.AreEqual(4, f.GetVariables().Count);
+            Assert.IsTrue(f.GetVariables().Contains("X"));
+            Assert.IsTrue(f.GetVariables().Contains("Y"));
+            Assert.IsTrue(f.GetVariables().Contains("Z"));
+            Assert.IsTrue(f.GetVariables().Contains("A2"));
+        }
+
+        /// <summary>
         /// A Lookup method that maps x to 4.0, y to 6.0, and z to 8.0.
         /// All other variables result in an UndefinedVariableException.
         /// </summary>

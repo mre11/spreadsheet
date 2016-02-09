@@ -25,16 +25,6 @@ namespace Formulas
         private List<string> formulaTokens;
 
         /// <summary>
-        /// Normalizes the variables in this formula in some canonical form.
-        /// </summary>
-        private Normalizer normalizer;
-
-        /// <summary>
-        /// Imposes extra restrictions of the validity of the variables in this formula.
-        /// </summary>
-        private Validator validator;
-
-        /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
         /// variable symbols (a letter followed by zero or more letters and/or digits), left and right
@@ -58,12 +48,6 @@ namespace Formulas
         {
             // Representation of the formula
             formulaTokens = GetTokens(formula).ToList();
-
-            // Normalizer is the identity function
-            normalizer = (s => s);
-
-            // Validator always returns true
-            validator = (s => true);
 
             int tokenCount = 0;
             int openParenCount = 0;
@@ -144,10 +128,10 @@ namespace Formulas
             : this(formula)
         {
             // TODO write more tests for constructor
-            var count = 0;
-
-            foreach (string token in formulaTokens)
+            for (int i = 0; i < formulaTokens.Count; i++)                    
             {
+                var token = formulaTokens[i];
+
                 if (IsVariableToken(token))
                 {
                     var normalizedToken = normalizer(token);
@@ -163,11 +147,9 @@ namespace Formulas
                     else
                     {
                         // Replace the variable token with its normalized form.
-                        formulaTokens[count] = normalizer(token);
+                        formulaTokens[i] = normalizedToken;
                     }
                 }
-
-                count++;
             }
         }
 
@@ -187,12 +169,6 @@ namespace Formulas
             {
                 formulaTokens = new List<string>();
                 formulaTokens.Add("0");
-
-                // Normalizer is the identity function
-                normalizer = (s => s);
-
-                // Validator always returns true
-                validator = (s => true);
             }
 
             // Create value and operator stacks
@@ -296,8 +272,17 @@ namespace Formulas
         /// </summary>
         public ISet<string> GetVariables()
         {
-            // TODO write tests for, and implement, GetVariables
-            return null;
+            var result = new HashSet<string>();
+            
+            foreach (string token in formulaTokens)
+            {
+                if (IsVariableToken(token))
+                {
+                    result.Add(token.ToString());
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -305,7 +290,6 @@ namespace Formulas
         /// </summary>
         public override string ToString()
         {
-            // TODO write tests for ToString
             var result = "";
 
             foreach (string token in formulaTokens)
