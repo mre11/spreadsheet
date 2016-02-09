@@ -2,6 +2,7 @@
 // Revised for CS 3500 by Joe Zachary, January 29, 2016
 // Modified for CS 3500 by Morgan Empey, University of Utah, Spring 2016
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,6 +66,18 @@ namespace Dependencies
         }
 
         /// <summary>
+        /// Creates a dependency graph that is an independent copy of dg.
+        /// </summary>
+        public DependencyGraph(DependencyGraph dg)
+            : this()
+        {
+            foreach (KeyValuePair<string, Vertex> kvp in dg.vertices)
+            {
+                this.vertices.Add(kvp.Key, new Vertex(kvp.Value.Name)); // TODO fix DependencyGraph constructor and test it. maybe have Vertex implement IClonable. can't make new Vertex here!
+            }
+        }
+
+        /// <summary>
         /// The number of dependencies in the DependencyGraph.
         /// </summary>
         public int Size
@@ -81,10 +94,15 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Reports whether dependents(s) is non-empty.  Requires s != null.
+        /// Reports whether dependents(s) is non-empty.
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex v;
 
             if (vertices.TryGetValue(s, out v))
@@ -99,10 +117,15 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Reports whether dependees(s) is non-empty.  Requires s != null.
+        /// Reports whether dependees(s) is non-empty.
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex v;
 
             if (vertices.TryGetValue(s, out v))
@@ -117,10 +140,15 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Enumerates dependents(s).  Requires s != null.
+        /// Enumerates dependents(s).
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex v;
 
             if (vertices.TryGetValue(s, out v))
@@ -133,10 +161,15 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Enumerates dependees(s).  Requires s != null.
+        /// Enumerates dependees(s).
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex v;
 
             if (vertices.TryGetValue(s, out v))
@@ -155,6 +188,11 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (s == null || t == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex left;
             Vertex right;
             
@@ -181,6 +219,11 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (s == null || t == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex left;
             Vertex right;
 
@@ -202,6 +245,11 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (s == null || newDependents == null || newDependents.Contains<string>(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex left;
 
             if (!vertices.TryGetValue(s, out left))
@@ -231,6 +279,11 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if (t == null || newDependees == null || newDependees.Contains<string>(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             Vertex right;
 
             if (!vertices.TryGetValue(t, out right))

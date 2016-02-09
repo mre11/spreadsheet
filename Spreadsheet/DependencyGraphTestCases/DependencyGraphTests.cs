@@ -18,6 +18,40 @@ namespace DependencyGraphTestCases
         /// Tests Size when dg is empty.
         /// </summary>
         [TestMethod]
+        public void TestConstructor1()
+        {
+            var dg1 = new DependencyGraph();
+            var dg2 = new DependencyGraph(dg1);
+
+            Assert.IsFalse(dg1 == dg2);
+        }
+
+        /// <summary>
+        /// Tests Size when dg is empty.
+        /// </summary>
+        [TestMethod]
+        public void TestConstructor2()
+        {
+            var dg1 = new DependencyGraph();
+
+            dg1.AddDependency("a1", "a2");
+            dg1.AddDependency("a1", "a3");
+            dg1.AddDependency("b1", "a1");
+            dg1.AddDependency("a2", "a3");
+            dg1.AddDependency("b2", "a2");
+            dg1.AddDependency("b2", "a3");
+            dg1.AddDependency("a1", "b2");
+
+            var dg2 = new DependencyGraph(dg1);
+
+            Assert.AreEqual(7, dg1.Size);
+            Assert.AreEqual(7, dg2.Size);
+        }
+
+        /// <summary>
+        /// Tests Size when dg is empty.
+        /// </summary>
+        [TestMethod]
         public void TestSize1()
         {
             var dg = new DependencyGraph();
@@ -110,6 +144,17 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Tests HasDependents for null argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestHasDependents2()
+        {
+            var dg = new DependencyGraph();
+            dg.HasDependents(null);
+        }
+
+        /// <summary>
         /// Tests HasDependees
         /// </summary>
         [TestMethod]
@@ -119,6 +164,17 @@ namespace DependencyGraphTestCases
             dg.AddDependency("a", "b");
             Assert.IsTrue(dg.HasDependees("b"));
             Assert.IsFalse(dg.HasDependees("a"));
+        }
+
+        /// <summary>
+        /// Tests HasDependees for null argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestHasDependees2()
+        {
+            var dg = new DependencyGraph();
+            dg.HasDependees(null);
         }
 
         /// <summary>
@@ -150,6 +206,17 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Tests GetDependents for null argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestGetDependents3()
+        {
+            var dg = new DependencyGraph();
+            var list = dg.GetDependents(null).ToList<string>();
+        }
+
+        /// <summary>
         /// Tests GetDependees when there are none.
         /// </summary>
         [TestMethod]
@@ -178,6 +245,17 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Tests GetDependees for null argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestGetDependees3()
+        {
+            var dg = new DependencyGraph();
+            var list = dg.GetDependees(null).ToList<string>();
+        }
+
+        /// <summary>
         /// Tests AddDependency for multple adds of the same
         /// dependency.
         /// </summary>
@@ -190,6 +268,39 @@ namespace DependencyGraphTestCases
             dg.AddDependency("2", "1");
 
             Assert.AreEqual(1, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests AddDependency for null first argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestAddDependency2()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency(null, "1");
+        }
+
+        /// <summary>
+        /// Tests AddDependency for null second argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestAddDependency3()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency("1", null);
+        }
+
+        /// <summary>
+        /// Tests AddDependency for null both arguments
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestAddDependency4()
+        {
+            var dg = new DependencyGraph();
+            dg.AddDependency(null, null);
         }
 
         /// <summary>
@@ -260,6 +371,39 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Tests RemoveDependency for null first argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestRemoveDependency5()
+        {
+            var dg = new DependencyGraph();
+            dg.RemoveDependency(null, "1");
+        }
+
+        /// <summary>
+        /// Tests RemoveDependency for null second argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestRemoveDependency6()
+        {
+            var dg = new DependencyGraph();
+            dg.RemoveDependency("1", null);
+        }
+
+        /// <summary>
+        /// Tests RemoveDependency for null both arguments
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestRemoveDependency7()
+        {
+            var dg = new DependencyGraph();
+            dg.RemoveDependency(null, null);
+        }
+
+        /// <summary>
         /// Test ReplaceDependents with no replacements.
         /// </summary>
         [TestMethod]
@@ -321,6 +465,63 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Tests ReplaceDependents for null first argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependents4()
+        {
+            var dg = new DependencyGraph();
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependents(null, list);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependents for null second argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependents5()
+        {
+            var dg = new DependencyGraph();
+            dg.ReplaceDependents("1", null);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependents for null both arguments
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependents6()
+        {
+            var dg = new DependencyGraph();
+            dg.ReplaceDependents(null, null);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependents for null in list
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependents7()
+        {
+            var dg = new DependencyGraph();
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add(null);
+            list.Add("c");
+
+            dg.ReplaceDependents("1", list);
+        }
+
+        /// <summary>
         /// Test ReplaceDependees with no replacements.
         /// </summary>
         [TestMethod]
@@ -375,6 +576,63 @@ namespace DependencyGraphTestCases
             dg.ReplaceDependees("1", list);
 
             Assert.AreEqual(3, dg.Size);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependees for null first argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependees4()
+        {
+            var dg = new DependencyGraph();
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add("c");
+
+            dg.ReplaceDependees(null, list);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependees for null second argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependees5()
+        {
+            var dg = new DependencyGraph();
+            dg.ReplaceDependees("1", null);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependees for null both arguments
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependees6()
+        {
+            var dg = new DependencyGraph();
+            dg.ReplaceDependees(null, null);
+        }
+
+        /// <summary>
+        /// Tests ReplaceDependees for null in list
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestReplaceDependees7()
+        {
+            var dg = new DependencyGraph();
+
+            var list = new List<string>();
+            list.Add("a");
+            list.Add("b");
+            list.Add(null);
+            list.Add("c");
+
+            dg.ReplaceDependees("1", list);
         }
 
         /// <summary>
