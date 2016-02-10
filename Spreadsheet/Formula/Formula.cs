@@ -127,7 +127,6 @@ namespace Formulas
         public Formula(string formula, Normalizer normalizer, Validator validator)
             : this(formula)
         {
-            // TODO write more tests for new Formula constructor
             for (int i = 0; i < formulaTokens.Count; i++)                    
             {
                 var token = formulaTokens[i];

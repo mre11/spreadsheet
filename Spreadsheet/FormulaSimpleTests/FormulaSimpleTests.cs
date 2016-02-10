@@ -129,7 +129,7 @@ namespace FormulaTestCases
         public void ZeroArgumentConstructor1()
         {
             Formula f = new Formula();
-            Assert.AreEqual(0, f.Evaluate(v => 1));
+            Assert.AreEqual(0, f.Evaluate(v => 1));// TODO add more tests for Formula zero-argument constructor
         }
 
         /// <summary>

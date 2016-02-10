@@ -73,7 +73,7 @@ namespace Dependencies
         {
             foreach (KeyValuePair<string, Vertex> kvp in dg.vertices)
             {
-                this.vertices.Add(kvp.Key, new Vertex(kvp.Value.Name)); // TODO fix DependencyGraph constructor and test it. maybe have Vertex implement IClonable. can't make new Vertex here!
+                this.vertices.Add(kvp.Key, (Vertex) kvp.Value.Clone());
             }
         }
 
@@ -310,7 +310,7 @@ namespace Dependencies
         /// Provides a representation of a single vertex of a DependencyGraph.
         /// A Vertex knows all its dependents and dependees.
         /// </summary>
-        private class Vertex
+        private class Vertex : ICloneable
         {
             /// <summary>
             /// The unique name of this Vertex.
@@ -501,6 +501,14 @@ namespace Dependencies
             public override int GetHashCode()
             {
                 return key.GetHashCode();
+            }
+
+            /// <summary>
+            /// Returns a clone (deep copy) of this Vertex
+            /// </summary>
+            public object Clone()
+            {
+                return new Vertex(this.key, this.GetAllDependents(), this.GetAllDependees());
             }
         }
     }

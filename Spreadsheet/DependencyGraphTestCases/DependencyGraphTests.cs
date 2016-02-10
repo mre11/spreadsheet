@@ -45,7 +45,7 @@ namespace DependencyGraphTestCases
             var dg2 = new DependencyGraph(dg1);
 
             Assert.AreEqual(7, dg1.Size);
-            Assert.AreEqual(7, dg2.Size);
+            Assert.AreEqual(7, dg2.Size);// TODO add more tests for DependencyGraph constructor
         }
 
         /// <summary>
