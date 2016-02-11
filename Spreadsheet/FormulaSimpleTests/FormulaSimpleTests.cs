@@ -129,7 +129,22 @@ namespace FormulaTestCases
         public void ZeroArgumentConstructor1()
         {
             Formula f = new Formula();
-            Assert.AreEqual(0, f.Evaluate(v => 1));// TODO add more tests for Formula zero-argument constructor
+            Assert.AreEqual(0, f.Evaluate(v => 1));
+        }
+
+        /// <summary>
+        /// Tests the behavior of the zero-argument constructor.
+        /// The formula format should behave the same as new Formula("0")
+        /// </summary>
+        [TestMethod]
+        public void ZeroArgumentConstructor2()
+        {
+            Formula f1 = new Formula();
+            Formula f2 = new Formula("0");
+
+            Assert.IsTrue(f1.ToString() == f2.ToString());
+            Assert.IsTrue(f1.Evaluate(v => 1) == f2.Evaluate(v => 1));
+            Assert.IsTrue(f1.GetVariables().Count == f2.GetVariables().Count);
         }
 
         /// <summary>

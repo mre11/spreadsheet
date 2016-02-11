@@ -45,7 +45,25 @@ namespace DependencyGraphTestCases
             var dg2 = new DependencyGraph(dg1);
 
             Assert.AreEqual(7, dg1.Size);
-            Assert.AreEqual(7, dg2.Size);// TODO add more tests for DependencyGraph constructor
+            Assert.AreEqual(7, dg2.Size);
+
+            // Check that modifying dg1 doesn't modify dg2
+            dg1.RemoveDependency("a1", "a2");
+
+            var list1 = dg1.GetDependents("a1").ToList();
+            var list2 = dg2.GetDependents("a1").ToList();
+
+            Assert.AreEqual(2, list1.Count);
+            Assert.AreEqual(3, list2.Count);
+
+            Assert.IsFalse(list1.Contains("a2"));
+            Assert.IsTrue(list2.Contains("a2"));
+
+            dg1.AddDependency("b1", "c1");
+
+            list2 = dg2.GetDependents("b1").ToList();
+
+            Assert.IsFalse(list2.Contains("c1"));
         }
 
         /// <summary>

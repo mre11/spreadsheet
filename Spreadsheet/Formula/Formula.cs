@@ -163,12 +163,7 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
-            // The zero-argument constructor sets formulaString to null; it should be set to "0" per specification
-            if (formulaTokens == null)
-            {
-                formulaTokens = new List<string>();
-                formulaTokens.Add("0");
-            }
+            FixNullFormula();
 
             // Create value and operator stacks
             var operatorStack = new Stack<string>();
@@ -271,6 +266,8 @@ namespace Formulas
         /// </summary>
         public ISet<string> GetVariables()
         {
+            FixNullFormula();
+
             var result = new HashSet<string>();
             
             foreach (string token in formulaTokens)
@@ -289,6 +286,8 @@ namespace Formulas
         /// </summary>
         public override string ToString()
         {
+            FixNullFormula();
+
             var result = "";
 
             foreach (string token in formulaTokens)
@@ -306,8 +305,6 @@ namespace Formulas
         ///     -Floating-point numbers
         ///     -Variables, which consist of one or more letters followed by zero or more letters/digits
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         private Boolean IsValidToken(string token)
         {
             if (token == "(" ||
@@ -325,8 +322,6 @@ namespace Formulas
         /// <summary>
         /// Returns true if the token is a valid floating-point number.
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         private Boolean IsNumberToken(string token)
         {
             double d;
@@ -336,8 +331,6 @@ namespace Formulas
         /// <summary>
         /// Returns true if the token is one or more letters followed by zero or more letters/digits.
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         private Boolean IsVariableToken(string token)
         {
             if (token == "" || !IsLetter(token[0]))
@@ -359,8 +352,6 @@ namespace Formulas
         /// <summary>
         /// Returns true if the token is a valid operator (+, -, *, or /)
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
         private Boolean IsOperatorToken(string s)
         {
             if (s == "+" || s == "-" || s == "*" || s == "/")
@@ -374,8 +365,6 @@ namespace Formulas
         /// <summary>
         /// Returns true if the character is an upper- or lower-case letter.
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
         private Boolean IsLetter(char c)
         {
             if ((c > 64 && c < 91) || (c > 96 && c < 123))
@@ -389,8 +378,6 @@ namespace Formulas
         /// <summary>
         /// Returns true if the character is a numeral 0-9
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
         private Boolean IsNumeral(char c)
         {
             if (c > 47 && c < 58)
@@ -405,10 +392,6 @@ namespace Formulas
         /// Performs the given binary operation of the form (lhs)(oper)(rhs).
         /// oper is expected to be +, -, *, or /
         /// </summary>
-        /// <param name="lhs"></param>
-        /// <param name="rhs"></param>
-        /// <param name="oper"></param>
-        /// <returns></returns>
         private double PerformOperation(double lhs, double rhs, string oper)
         {
             switch (oper)
@@ -435,14 +418,25 @@ namespace Formulas
         /// performs the operation on the values, and pushes the result onto the values
         /// stack.
         /// </summary>
-        /// <param name="values"></param>
-        /// <param name="opers"></param>
         private void PushNewValue(Stack<double> values, Stack<string> opers)
         {
             string poppedOperator = opers.Pop();
             double rhs = values.Pop();
 
             values.Push(PerformOperation(values.Pop(), rhs, poppedOperator));
+        }
+
+        /// <summary>
+        /// A Formula created with the zero-argument constructor will have a null formulaTokens.
+        /// This should be treated the same as a "0" formula.
+        /// </summary>
+        private void FixNullFormula()
+        {
+            if (formulaTokens == null)
+            {
+                formulaTokens = new List<string>();
+                formulaTokens.Add("0");
+            }
         }
         
     }
@@ -457,12 +451,13 @@ namespace Formulas
     public delegate double Lookup(string s);
 
     /// <summary>
-    /// 
+    /// A normalizer converts variables into a canonical form.
     /// </summary>
     public delegate string Normalizer(string s);
 
     /// <summary>
-    /// 
+    /// A Validator imposes extra restrictions on the validity of a variable,
+    /// beyond the ones already built into the Formula definition.
     /// </summary>
     public delegate bool Validator(string s);
 
@@ -476,7 +471,6 @@ namespace Formulas
         /// Constructs an UndefinedVariableException containing whose message is the
         /// undefined variable.
         /// </summary>
-        /// <param name="variable"></param>
         public UndefinedVariableException(String variable)
             : base(variable)
         {

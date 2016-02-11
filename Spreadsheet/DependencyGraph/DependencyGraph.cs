@@ -95,6 +95,7 @@ namespace Dependencies
 
         /// <summary>
         /// Reports whether dependents(s) is non-empty.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public bool HasDependents(string s)
         {
@@ -118,6 +119,7 @@ namespace Dependencies
 
         /// <summary>
         /// Reports whether dependees(s) is non-empty.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public bool HasDependees(string s)
         {
@@ -141,6 +143,7 @@ namespace Dependencies
 
         /// <summary>
         /// Enumerates dependents(s).
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
@@ -162,6 +165,7 @@ namespace Dependencies
 
         /// <summary>
         /// Enumerates dependees(s).
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
@@ -184,7 +188,7 @@ namespace Dependencies
         /// <summary>
         /// Adds the dependency (s,t) to this DependencyGraph.
         /// This has no effect if (s,t) already belongs to this DependencyGraph.
-        /// Requires s != null and t != null.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public void AddDependency(string s, string t)
         {
@@ -215,7 +219,7 @@ namespace Dependencies
         /// <summary>
         /// Removes the dependency (s,t) from this DependencyGraph.
         /// Does nothing if (s,t) doesn't belong to this DependencyGraph.
-        /// Requires s != null and t != null.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
@@ -241,11 +245,11 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (s,r).  Then, for each
         /// t in newDependents, adds the dependency (s,t).
-        /// Requires s != null and t != null.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
-            if (s == null || newDependents == null || newDependents.Contains<string>(null))
+            if (s == null || newDependents == null || newDependents.Contains(null))
             {
                 throw new ArgumentNullException();
             }
@@ -275,11 +279,11 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (r,t).  Then, for each 
         /// s in newDependees, adds the dependency (s,t).
-        /// Requires s != null and t != null.
+        /// Throws an exception if null arguments are provided.
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
-            if (t == null || newDependees == null || newDependees.Contains<string>(null))
+            if (t == null || newDependees == null || newDependees.Contains(null))
             {
                 throw new ArgumentNullException();
             }

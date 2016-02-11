@@ -916,6 +916,9 @@ namespace GradingTests
                     Assert.IsTrue(dents[i].SetEquals(new HashSet<string>(t.GetDependents(letters[i]))));
                     Assert.IsTrue(dees[i].SetEquals(new HashSet<string>(t.GetDependees(letters[i]))));
                 }
+
+                // Clone the DependencyGraph using the constructor
+                var dg = new DependencyGraph(t);
             }
 
             [TestMethod()]
