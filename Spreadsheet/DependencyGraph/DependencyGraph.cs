@@ -52,17 +52,19 @@ namespace Dependencies
     public class DependencyGraph
     {
         /// <summary>
-        /// Represents the graph as a Dictionary of vertices, where the key is the name of the Vertex.
-        /// Each Vertex maintains references to its dependents and dependees.
+        /// Each vertex of the graph is a string. The two dictionaries can be used to look up the
+        /// dependents and dependees, respectively, of a given string.
         /// </summary>
-        private Dictionary<string, Vertex> vertices;
+        private Dictionary<string, HashSet<string>> dependents;
+        private Dictionary<string, HashSet<string>> dependees;
 
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
-            vertices = new Dictionary<string, Vertex>();
+            dependents = new Dictionary<string, HashSet<string>>();
+            dependees = new Dictionary<string, HashSet<string>>();
         }
 
         /// <summary>
@@ -71,9 +73,14 @@ namespace Dependencies
         public DependencyGraph(DependencyGraph dg)
             : this()
         {
-            foreach (KeyValuePair<string, Vertex> kvp in dg.vertices)
+            foreach (KeyValuePair<string, HashSet<string>> kvp in dg.dependents)
             {
-                this.vertices.Add(kvp.Key, (Vertex) kvp.Value.Clone());
+                this.dependents.Add(kvp.Key, new HashSet<string>(kvp.Value));
+            }
+
+            foreach (KeyValuePair<string, HashSet<string>> kvp in dg.dependees)
+            {
+                this.dependees.Add(kvp.Key, new HashSet<string>(kvp.Value));
             }
         }
 
@@ -85,9 +92,9 @@ namespace Dependencies
             get
             {
                 var count = 0;
-                foreach (KeyValuePair<string, Vertex> pair in vertices)
+                foreach (KeyValuePair<string, HashSet<string>> kvp in dependents)
                 {
-                    count += pair.Value.Size;
+                    count += kvp.Value.Count;
                 }
                 return count;
             }
@@ -104,17 +111,10 @@ namespace Dependencies
                 throw new ArgumentNullException();
             }
 
-            Vertex v;
+            HashSet<string> tempSet;
+            var hasValue = dependents.TryGetValue(s, out tempSet);
 
-            if (vertices.TryGetValue(s, out v))
-            {
-                if (v.GetAllDependents().Any())
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return hasValue && tempSet.Count > 0;
         }
 
         /// <summary>
@@ -128,17 +128,10 @@ namespace Dependencies
                 throw new ArgumentNullException();
             }
 
-            Vertex v;
+            HashSet<string> tempSet;
+            var hasValue = dependees.TryGetValue(s, out tempSet);
 
-            if (vertices.TryGetValue(s, out v))
-            {
-                if (v.GetAllDependees().Any())
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return hasValue && tempSet.Count > 0;
         }
 
         /// <summary>
@@ -152,13 +145,13 @@ namespace Dependencies
                 throw new ArgumentNullException();
             }
 
-            Vertex v;
+            HashSet<string> tempSet;
 
-            if (vertices.TryGetValue(s, out v))
+            if (dependents.TryGetValue(s, out tempSet))
             {
-                foreach (string name in v.GetAllDependentsNames())
+                foreach (string t in tempSet)
                 {
-                    yield return name;
+                    yield return t;
                 }
             }
         }
@@ -167,20 +160,20 @@ namespace Dependencies
         /// Enumerates dependees(s).
         /// Throws an exception if null arguments are provided.
         /// </summary>
-        public IEnumerable<string> GetDependees(string s)
+        public IEnumerable<string> GetDependees(string t)
         {
-            if (s == null)
+            if (t == null)
             {
                 throw new ArgumentNullException();
             }
 
-            Vertex v;
+            HashSet<string> tempSet;
 
-            if (vertices.TryGetValue(s, out v))
+            if (dependees.TryGetValue(t, out tempSet))
             {
-                foreach (string name in v.GetAllDependeesNames())
+                foreach (string s in tempSet)
                 {
-                    yield return name;
+                    yield return s;
                 }
             }
         }
@@ -197,23 +190,31 @@ namespace Dependencies
                 throw new ArgumentNullException();
             }
 
-            Vertex left;
-            Vertex right;
-            
-            // If a vertex doesn't exist, add it.
-            if (!vertices.TryGetValue(s, out left))
+            HashSet<string> tempSet;
+
+            // Add the dependency to dependents
+            if (dependents.TryGetValue(s, out tempSet))
             {
-                vertices.Add(s, left = new Vertex(s));
+                tempSet.Add(t);
+            }
+            else
+            {
+                tempSet = new HashSet<string>();
+                tempSet.Add(t);
+                dependents.Add(s, tempSet);
             }
 
-            if (!vertices.TryGetValue(t, out right))
+            // Add the dependency to dependees
+            if (dependees.TryGetValue(t, out tempSet))
             {
-                vertices.Add(t, right = new Vertex(t));
+                tempSet.Add(s);
             }
-
-            // Add the dependency
-            left.AddDependent(right);
-            right.AddDependee(left);
+            else
+            {
+                tempSet = new HashSet<string>();
+                tempSet.Add(s);
+                dependees.Add(t, tempSet);
+            }
         }
 
         /// <summary>
@@ -228,18 +229,19 @@ namespace Dependencies
                 throw new ArgumentNullException();
             }
 
-            Vertex left;
-            Vertex right;
+            HashSet<string> tempSet;
 
-            // If either vertex doesn't exist, there's nothing to remove
-            if (!vertices.TryGetValue(s, out left) || !vertices.TryGetValue(t, out right))
+            // Remove dependency from dependents
+            if (dependents.TryGetValue(s, out tempSet))
             {
-                return;
+                tempSet.Remove(t);
             }
 
-            // Remove the dependency
-            left.RemoveDependent(right.Name);
-            right.RemoveDependee(left.Name);
+            // Remove dependency from dependees
+            if (dependees.TryGetValue(t, out tempSet))
+            {
+                tempSet.Remove(s);
+            }
         }
 
         /// <summary>
@@ -253,26 +255,25 @@ namespace Dependencies
             {
                 throw new ArgumentNullException();
             }
+            
+            HashSet<string> tempSet;
 
-            Vertex left;
-
-            if (!vertices.TryGetValue(s, out left))
+            // Remove the dependencies from dependents
+            if (dependents.TryGetValue(s, out tempSet))
             {
-                vertices.Add(s, left = new Vertex(s));
+                dependents.Remove(s);
             }
 
-            left.RemoveAllDependents();
-
-            // Remove s from the dependees list of each of its dependents
-            foreach (KeyValuePair<string, Vertex> pair in vertices)
+            // Remove the dependencies from dependees
+            foreach (KeyValuePair<string, HashSet<string>> kvp in dependees)
             {
-                pair.Value.RemoveDependee(s);
+                kvp.Value.Remove(s);
             }
 
-            // Add the new dependents
-            foreach (string name in newDependents)
+            // Add the new dependencies to dependents and dependees
+            foreach (string newString in newDependents)
             {
-                AddDependency(s, name);
+                this.AddDependency(s, newString);
             }
         }
 
@@ -287,232 +288,25 @@ namespace Dependencies
             {
                 throw new ArgumentNullException();
             }
+            
+            HashSet<string> tempSet;
 
-            Vertex right;
-
-            if (!vertices.TryGetValue(t, out right))
+            // Remove the dependencies from dependees
+            if (dependees.TryGetValue(t, out tempSet))
             {
-                vertices.Add(t, right = new Vertex(t));
+                dependees.Remove(t);
             }
 
-            right.RemoveAllDependees();
-
-            // Remove t from the dependents list of each of its dependees
-            foreach (KeyValuePair<string, Vertex> pair in vertices)
+            // Remove the dependencies from dependents
+            foreach (KeyValuePair<string, HashSet<string>> kvp in dependents)
             {
-                pair.Value.RemoveDependent(t);
+                kvp.Value.Remove(t);
             }
 
-            // Add the new dependees
-            foreach (string name in newDependees)
+            // Add the new dependencies to dependents and dependees
+            foreach (string newString in newDependees)
             {
-                AddDependency(name, t);
-            }
-        }
-
-        /// <summary>
-        /// Provides a representation of a single vertex of a DependencyGraph.
-        /// A Vertex knows all its dependents and dependees.
-        /// </summary>
-        private class Vertex : ICloneable
-        {
-            /// <summary>
-            /// The unique name of this Vertex.
-            /// </summary>
-            private string key;
-
-            /// <summary>
-            /// The size of a Vertex is the number of its dependents.
-            /// </summary>
-            private int size;
-
-            /// <summary>
-            /// Lists all dependents of this Vertex.
-            /// </summary>
-            private Dictionary<string, Vertex> dependents;
-
-            /// <summary>
-            /// Lists all dependees of this Vertex.
-            /// </summary>
-            private Dictionary<string, Vertex> dependees;
-
-            /// <summary>
-            /// Constructs a new Vertex object with no dependents or dependees.
-            /// </summary>
-            internal Vertex(string name)
-            {
-                key = name;
-                size = 0;
-                dependents = new Dictionary<string, Vertex>();
-                dependees = new Dictionary<string, Vertex>();
-            }
-
-            /// <summary>
-            /// Constructs a new Vertex object with the given name, dependents, and dependees.
-            /// Dependents and dependees are allowed to be empty.
-            /// </summary>
-            internal Vertex(string name, IEnumerable<Vertex> dependents, IEnumerable<Vertex> dependees)
-                : this(name)
-            {
-                this.AddDependents(dependents);
-                this.AddDependees(dependees);             
-            }
-
-            /// <summary>
-            /// Returns the name of this Vertex.
-            /// </summary>
-            internal string Name
-            {
-                get { return key; }
-            }
-
-            /// <summary>
-            /// Returns the size of this Vertex.
-            /// </summary>
-            internal int Size
-            {
-                get { return size; }
-            }
-
-            /// <summary>
-            /// Returns all dependents of this Vertex.
-            /// </summary>
-            internal IEnumerable<Vertex> GetAllDependents()
-            {
-                foreach (KeyValuePair<string, Vertex> pair in this.dependents)
-                {
-                    yield return pair.Value;
-                }
-            }
-
-            /// <summary>
-            /// Returns an enumeration of the names of all dependents of this Vertex.
-            /// </summary>
-            internal IEnumerable<string> GetAllDependentsNames()
-            {
-                foreach (KeyValuePair<string, Vertex> pair in this.dependents)
-                {
-                    yield return pair.Key;
-                }
-            }
-
-            /// <summary>
-            /// Returns all dependees of this Vertex.
-            /// </summary>
-            internal IEnumerable<Vertex> GetAllDependees()
-            {
-                foreach (KeyValuePair<string, Vertex> pair in this.dependees)
-                {
-                    yield return pair.Value;
-                }
-            }
-
-            /// <summary>
-            /// Returns an enumeration of the names of all dependees of this Vertex.
-            /// </summary>
-            internal IEnumerable<string> GetAllDependeesNames()
-            {
-                foreach (KeyValuePair<string, Vertex> pair in this.dependees)
-                {
-                    yield return pair.Key;
-                }
-            }
-
-            /// <summary>
-            /// Adds a single dependent to this Vertex. Does nothing if the dependent already exists.
-            /// </summary>
-            internal void AddDependent(Vertex v)
-            {
-                if (!dependents.ContainsKey(v.Name))
-                {
-                    dependents.Add(v.Name, v);
-                    size++;
-                }
-            }
-
-            /// <summary>
-            /// Adds multiple dependents to this Vertex.
-            /// </summary>
-            internal void AddDependents(IEnumerable<Vertex> vertices)
-            {
-                foreach (Vertex v in vertices)
-                {
-                    this.AddDependent(v);
-                }
-            }
-
-            /// <summary>
-            /// Adds a single dependee to this Vertex. Does nothing if the dependee already exists.
-            /// </summary>
-            internal void AddDependee(Vertex v)
-            {
-                if (!dependees.ContainsKey(v.Name))
-                {
-                    dependees.Add(v.Name, v);
-                }
-            }
-
-            /// <summary>
-            /// Adds multiple dependees to this Vertex.
-            /// </summary>
-            internal void AddDependees(IEnumerable<Vertex> vertices)
-            {
-                foreach (Vertex v in vertices)
-                {
-                    this.AddDependee(v);
-                }
-            }
-
-            /// <summary>
-            /// Removes a single dependent from this Vertex.
-            /// </summary>
-            internal void RemoveDependent(string name)
-            {
-                if (dependents.Remove(name))
-                {
-                    size--;
-                }
-            }
-
-            /// <summary>
-            /// Removes all dependents from this vertex.
-            /// </summary>
-            internal void RemoveAllDependents()
-            {
-                dependents = new Dictionary<string, Vertex>();
-                size = 0;
-            }
-
-            /// <summary>
-            /// Removes a single dependee from this Vertex.
-            /// </summary>
-            internal void RemoveDependee(string name)
-            {
-                dependees.Remove(name);
-            }
-
-            /// <summary>
-            /// Removes all dependees from this Vertex.
-            /// </summary>
-            internal void RemoveAllDependees()
-            {
-                dependees = new Dictionary<string, Vertex>();
-            }
-
-            /// <summary>
-            /// The hash code of a Vertex is the hash code of its Name.
-            /// </summary>
-            public override int GetHashCode()
-            {
-                return key.GetHashCode();
-            }
-
-            /// <summary>
-            /// Returns a clone (deep copy) of this Vertex
-            /// </summary>
-            public object Clone()
-            {
-                return new Vertex(this.key, this.GetAllDependents(), this.GetAllDependees());
+                this.AddDependency(newString, t);
             }
         }
     }
