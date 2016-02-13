@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Formulas;
+using System.Text.RegularExpressions;
 
 namespace SS
 {
@@ -30,7 +31,7 @@ namespace SS
     /// A1 depends on B1, which depends on C1, which depends on A1.  That's a circular
     /// dependency.
     /// </summary>
-    class Spreadsheet : AbstractSpreadsheet
+    public class Spreadsheet : AbstractSpreadsheet
     {
         /// <summary>
         /// A Spreadsheet is set of Cells.
@@ -46,20 +47,20 @@ namespace SS
         }
 
         /// <summary>
+        /// Enumerates the names of all the non-empty cells in the spreadsheet.
+        /// </summary>
+        public override IEnumerable<string> GetNamesOfAllNonemptyCells()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// If name is null or invalid, throws an InvalidNameException.
         /// 
         /// Otherwise, returns the contents (as opposed to the value) of the named cell.  The return
         /// value should be either a string, a double, or a Formula.
         /// </summary>
         public override object GetCellContents(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Enumerates the names of all the non-empty cells in the spreadsheet.
-        /// </summary>
-        public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             throw new NotImplementedException();
         }
@@ -178,11 +179,18 @@ namespace SS
             /// </summary>
             private object value;
 
+            static Regex cellNameRegex = new Regex(@"[a-zA-z]+[1-9]+\d*");
+
             /// <summary>
             /// Creates an empty cell.
             /// </summary>
             private Cell(string name)
             {
+                if (!cellNameRegex.IsMatch(name))
+                {
+                    throw new InvalidNameException();
+                }
+
                 this.name = name;
                 contents = "";
                 value = "";
