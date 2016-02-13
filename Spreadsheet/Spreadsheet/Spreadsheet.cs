@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Formulas;
 using System.Text.RegularExpressions;
+using Dependencies;
 
 namespace SS
 {
@@ -34,16 +32,27 @@ namespace SS
     public class Spreadsheet : AbstractSpreadsheet
     {
         /// <summary>
-        /// A Spreadsheet is set of Cells.
+        /// A Spreadsheet is set of Cells that can be looked up by name
         /// </summary>
-        private HashSet<Cell> cells;
+        private Dictionary<string,Cell> cells;
+
+        /// <summary>
+        /// Tracks the dependencies among cells in the spreadsheet
+        /// </summary>
+        private DependencyGraph dg;
+
+        /// <summary>
+        /// Defines the allowed pattern for a cell name
+        /// </summary>
+        static Regex cellNameRegex = new Regex(@"[a-zA-z]+[1-9]+\d*");
 
         /// <summary>
         /// Creates an empty Spreadsheet
         /// </summary>
         public Spreadsheet()
         {
-            cells = new HashSet<Cell>();
+            cells = new Dictionary<string, Cell>();
+            dg = new DependencyGraph();
         }
 
         /// <summary>
@@ -51,7 +60,10 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            throw new NotImplementedException();
+            foreach (KeyValuePair<string, Cell> kvp in cells)
+            {
+                yield return kvp.Key;
+            }
         }
 
         /// <summary>
@@ -62,7 +74,18 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            throw new NotImplementedException();
+            if (name == null || !cellNameRegex.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            Cell c;
+            if (cells.TryGetValue(name, out c))
+            {
+                return c.Contents;
+            }
+
+            return "";
         }
 
         /// <summary>
@@ -82,6 +105,12 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
+            //TODO what about null formula?
+            if (name == null || !cellNameRegex.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
             throw new NotImplementedException();
         }
 
@@ -99,6 +128,15 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if (name == null || !cellNameRegex.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
             throw new NotImplementedException();
         }
 
@@ -114,6 +152,11 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, double number)
         {
+            if (name == null || !cellNameRegex.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
             throw new NotImplementedException();
         }
 
@@ -136,7 +179,19 @@ namespace SS
         /// </summary>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
-            throw new NotImplementedException();
+            if (name == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if (!cellNameRegex.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            foreach (string dependentName in dg.GetDependents(name))
+            {               
+                yield return dependentName;
+            }
         }
 
         /// <summary>
@@ -179,8 +234,6 @@ namespace SS
             /// </summary>
             private object value;
 
-            static Regex cellNameRegex = new Regex(@"[a-zA-z]+[1-9]+\d*");
-
             /// <summary>
             /// Creates an empty cell.
             /// </summary>
@@ -196,14 +249,17 @@ namespace SS
                 value = "";
             }
 
-            /// <summary>
-            /// Returns the hash code for this Cell
-            /// </summary>
-            public override int GetHashCode()
+            public string Name
             {
-                return name.GetHashCode();
+                get { return name; }
+
             }
 
+            public object Contents
+            {
+                get { return contents; }
+                set { contents = value; }
+            }
         }
     }
 }
