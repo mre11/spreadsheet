@@ -47,7 +47,7 @@ namespace SS
         /// followed by a non-zero digit, followed by zero or more digits.  Cell names
         /// are not case sensitive.
         /// </summary>
-        static Regex cellNameRegex = new Regex(@"[a-zA-z]+[1-9]+\d*");
+        static Regex allowedCellName = new Regex(@"[a-zA-z]+[1-9]+\d*");
 
         /// <summary>
         /// Creates an empty Spreadsheet
@@ -77,7 +77,7 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            if (name == null || !cellNameRegex.IsMatch(name))
+            if (name == null || !allowedCellName.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -154,7 +154,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null || !cellNameRegex.IsMatch(name))
+            else if (name == null || !allowedCellName.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -206,7 +206,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (!cellNameRegex.IsMatch(name))
+            else if (!allowedCellName.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -264,7 +264,7 @@ namespace SS
             /// </summary>
             internal Cell(string name)
             {
-                if (!cellNameRegex.IsMatch(name))
+                if (!allowedCellName.IsMatch(name))
                 {
                     throw new InvalidNameException();
                 }
@@ -283,10 +283,13 @@ namespace SS
                 this.contents = contents;
             }
 
+            /// <summary>
+            /// Exposes the contents of this Cell.
+            /// </summary>
             public object Contents
             {
                 get { return contents; }
-                set { contents = value; }
+                internal set { contents = value; }
             }
         }
     }

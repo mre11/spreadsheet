@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Formulas;
+using System.Collections.Generic;
 
 namespace SS
 {
@@ -182,6 +183,53 @@ namespace SS
             ss.SetCellContents("a3", "hello");
 
             Assert.AreEqual("hello", ss.GetCellContents("A3"));
+        }
+
+        /// <summary>
+        /// Tests method for null parameter
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestGetDirectDependents1()
+        {
+            var ss = new Spreadsheet();
+            PrivateObject ssAccessor = new PrivateObject(ss);
+
+            object[] parameters = { null };
+            List<string> result = ((IEnumerable<string>)ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
+        }
+
+        /// <summary>
+        /// Tests method for null parameter
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestGetDirectDependents2()
+        {
+            var ss = new Spreadsheet();
+            PrivateObject ssAccessor = new PrivateObject(ss);
+
+            object[] parameters = { "test" };
+            List<string> result = ((IEnumerable<string>)ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
+        }
+
+        /// <summary>
+        /// Tests method for null parameter
+        /// </summary>
+        [TestMethod]
+        public void TestGetDirectDependents3()
+        {
+            var ss = new Spreadsheet();
+            ss.SetCellContents("a1", new Formula("a2"));
+            ss.SetCellContents("a2", "hello world");
+
+            PrivateObject ssAccessor = new PrivateObject(ss);
+
+            object[] parameters = { "a1" };
+            List<string> result = ((IEnumerable<string>) ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.IsTrue(result.Contains("A2"));
         }
 
         /// <summary>
