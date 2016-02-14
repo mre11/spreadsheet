@@ -110,31 +110,7 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
-            //TODO what about null formula?
-            if (name == null || !cellNameRegex.IsMatch(name))
-            {
-                throw new InvalidNameException();
-            }
-
-            var normalizedName = name.ToUpper();
-
-            // Add the dependencies to dg
-            dg.ReplaceDependents(normalizedName, formula.GetVariables());
-
-            ISet<string> result = new HashSet<string>();
-            result.UnionWith(GetCellsToRecalculate(normalizedName));
-
-            Cell c;
-            if (cells.TryGetValue(normalizedName, out c))
-            {
-                c.Contents = formula;
-            }
-            else
-            {
-                cells.Add(normalizedName, new Cell(normalizedName, formula));
-            }
-
-            return result;
+            return SetCellContents(name, (object) formula);
         }
 
         /// <summary>
@@ -151,29 +127,7 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, string text)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException();
-            }
-            else if (name == null || !cellNameRegex.IsMatch(name))
-            {
-                throw new InvalidNameException();
-            }
-
-            var normalizedName = name.ToUpper();
-
-            Cell c;
-            if (cells.TryGetValue(normalizedName, out c))
-            {
-                c.Contents = text;
-            }
-            else
-            {
-                cells.Add(normalizedName, new Cell(normalizedName, text));
-            }
-
-            ISet<string> result = new HashSet<string>() { normalizedName };
-            return GetAllDependentsRecursive(result);
+            return SetCellContents(name, (object) text);
         }
 
         /// <summary>
@@ -188,48 +142,45 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, double number)
         {
-            if (name == null || !cellNameRegex.IsMatch(name))
+            return SetCellContents(name, (object) number);            
+        }
+
+        /// <summary>
+        /// Helper method for SetCellContents public methods
+        /// </summary>
+        private ISet<string> SetCellContents(string name, object contents)
+        {
+            if (contents == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if (name == null || !cellNameRegex.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
 
             var normalizedName = name.ToUpper();
 
+            // If contents is a Formula, add any dependencies to dg
+            if (contents.GetType() == typeof(Formula))
+            {
+                dg.ReplaceDependents(normalizedName, ((Formula) contents).GetVariables());
+            }
+
+            ISet<string> result = new HashSet<string>();
+            result.UnionWith(GetCellsToRecalculate(normalizedName));
+
             Cell c;
             if (cells.TryGetValue(normalizedName, out c))
             {
-                c.Contents = number;
+                c.Contents = contents;
             }
             else
             {
-                cells.Add(normalizedName, new Cell(normalizedName, number));
+                cells.Add(normalizedName, new Cell(normalizedName, contents));
             }
 
-            ISet<string> result = new HashSet<string>() { normalizedName };
-            return GetAllDependentsRecursive(result);
-        }
-
-        /// <summary>
-        /// Returns the set of all direct or indirect dependents of the
-        /// strings in the set.
-        /// </summary>
-        private ISet<string> GetAllDependentsRecursive(ISet<string> set)
-        {
-            bool keepGoing = false;
-            ISet<string> directDependents = new HashSet<string>();
-
-            foreach (string s in set)
-            {
-                if (dg.HasDependents(s))
-                {
-                    keepGoing = true;
-                }
-                directDependents.UnionWith(GetDirectDependents(s));
-            }
-
-            set.UnionWith(directDependents);
-
-            return keepGoing ? GetAllDependentsRecursive(set) : set;
+            return result;
         }
 
         /// <summary>
@@ -330,12 +281,6 @@ namespace SS
                 : this(name)
             {
                 this.contents = contents;
-            }
-
-            public string Name
-            {
-                get { return name; }
-
             }
 
             public object Contents

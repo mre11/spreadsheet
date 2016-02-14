@@ -172,6 +172,19 @@ namespace SS
         }
 
         /// <summary>
+        /// Tests method for changing existing cell contents
+        /// </summary>
+        [TestMethod]
+        public void TestSetCellContents6()
+        {
+            var ss = new Spreadsheet();
+            ss.SetCellContents("a3", new Formula("a4 + 11"));
+            ss.SetCellContents("a3", "hello");
+
+            Assert.AreEqual("hello", ss.GetCellContents("A3"));
+        }
+
+        /// <summary>
         /// Returns the upper-case version of s
         /// </summary>
         public string UpperCaseNormalizer(string s)
