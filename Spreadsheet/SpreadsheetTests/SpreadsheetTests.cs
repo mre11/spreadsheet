@@ -36,9 +36,9 @@ namespace SS
             var list = ss.GetNamesOfAllNonemptyCells().ToList();
 
             Assert.AreEqual(3, list.Count);
-            Assert.IsTrue(list.Contains("a1"));
-            Assert.IsTrue(list.Contains("a2"));
-            Assert.IsTrue(list.Contains("a3"));
+            Assert.IsTrue(list.Contains("A1"));
+            Assert.IsTrue(list.Contains("A2"));
+            Assert.IsTrue(list.Contains("A3"));
         }
 
         /// <summary>
@@ -83,13 +83,13 @@ namespace SS
             var ss = new Spreadsheet();
             ss.SetCellContents("a1", "hello");
             ss.SetCellContents("a2", 0.55);
-            ss.SetCellContents("a3", new Formula(""));
+            ss.SetCellContents("a3", new Formula("a2"));
             ss.SetCellContents("a4", new Formula("3 + 4"));
 
             Assert.AreEqual("hello", ss.GetCellContents("a1"));
             Assert.AreEqual(0.55, ss.GetCellContents("A2"));
-            Assert.AreEqual("", ss.GetCellContents("a3").ToString());
-            Assert.AreEqual("3+4", ss.GetCellContents("A4"));
+            Assert.AreEqual("a2", ss.GetCellContents("a3").ToString());
+            Assert.AreEqual("3+4", ss.GetCellContents("A4").ToString());
         }
 
         /// <summary>
@@ -150,22 +150,25 @@ namespace SS
 
             ss.SetCellContents("A2", 11);
 
-            Assert.AreEqual(11, ss.GetCellContents("a2"));
+            Assert.AreEqual(11d, ss.GetCellContents("a2"));
 
             var set1 = ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, v => true));
             var set2 = ss.SetCellContents("A4", new Formula("a2 + 5", UpperCaseNormalizer, v => true));
             var set3 = ss.SetCellContents("a5", new Formula("a2 + a3 + a4", UpperCaseNormalizer, v => true));
 
-            Assert.AreEqual(1, set1.Count);
+            Assert.AreEqual(2, set1.Count);
+            Assert.IsTrue(set1.Contains("A3"));
             Assert.IsTrue(set1.Contains("A4"));
 
-            Assert.AreEqual(1, set2.Count);
+            Assert.AreEqual(2, set2.Count);
             Assert.IsTrue(set2.Contains("A2"));
+            Assert.IsTrue(set2.Contains("A4"));
 
-            Assert.AreEqual(3, set3.Count);
+            Assert.AreEqual(4, set3.Count);
             Assert.IsTrue(set3.Contains("A2"));
             Assert.IsTrue(set3.Contains("A3"));
             Assert.IsTrue(set3.Contains("A4"));
+            Assert.IsTrue(set3.Contains("A5"));
         }
 
         /// <summary>

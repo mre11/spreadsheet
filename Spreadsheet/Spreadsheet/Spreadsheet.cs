@@ -42,7 +42,10 @@ namespace SS
         private DependencyGraph dg;
 
         /// <summary>
-        /// Defines the allowed pattern for a cell name
+        /// Defines the allowed pattern for a cell name.
+        /// A string is a cell name if and only if it consists of one or more letters, 
+        /// followed by a non-zero digit, followed by zero or more digits.  Cell names
+        /// are not case sensitive.
         /// </summary>
         static Regex cellNameRegex = new Regex(@"[a-zA-z]+[1-9]+\d*");
 
@@ -79,13 +82,15 @@ namespace SS
                 throw new InvalidNameException();
             }
 
+            var normalizedName = name.ToUpper();
+
             Cell c;
-            if (cells.TryGetValue(name, out c))
+            if (cells.TryGetValue(normalizedName, out c))
             {
                 return c.Contents;
             }
 
-            return "";
+            return ""; // if name isn't in cells, the Cell's contents are the empty string
         }
 
         /// <summary>
@@ -111,7 +116,25 @@ namespace SS
                 throw new InvalidNameException();
             }
 
-            throw new NotImplementedException();
+            var normalizedName = name.ToUpper();
+
+            // Add the dependencies to dg
+            dg.ReplaceDependents(normalizedName, formula.GetVariables());
+
+            ISet<string> result = new HashSet<string>();
+            result.UnionWith(GetCellsToRecalculate(normalizedName));
+
+            Cell c;
+            if (cells.TryGetValue(normalizedName, out c))
+            {
+                c.Contents = formula;
+            }
+            else
+            {
+                cells.Add(normalizedName, new Cell(normalizedName, formula));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -137,7 +160,20 @@ namespace SS
                 throw new InvalidNameException();
             }
 
-            throw new NotImplementedException();
+            var normalizedName = name.ToUpper();
+
+            Cell c;
+            if (cells.TryGetValue(normalizedName, out c))
+            {
+                c.Contents = text;
+            }
+            else
+            {
+                cells.Add(normalizedName, new Cell(normalizedName, text));
+            }
+
+            ISet<string> result = new HashSet<string>() { normalizedName };
+            return GetAllDependentsRecursive(result);
         }
 
         /// <summary>
@@ -157,7 +193,43 @@ namespace SS
                 throw new InvalidNameException();
             }
 
-            throw new NotImplementedException();
+            var normalizedName = name.ToUpper();
+
+            Cell c;
+            if (cells.TryGetValue(normalizedName, out c))
+            {
+                c.Contents = number;
+            }
+            else
+            {
+                cells.Add(normalizedName, new Cell(normalizedName, number));
+            }
+
+            ISet<string> result = new HashSet<string>() { normalizedName };
+            return GetAllDependentsRecursive(result);
+        }
+
+        /// <summary>
+        /// Returns the set of all direct or indirect dependents of the
+        /// strings in the set.
+        /// </summary>
+        private ISet<string> GetAllDependentsRecursive(ISet<string> set)
+        {
+            bool keepGoing = false;
+            ISet<string> directDependents = new HashSet<string>();
+
+            foreach (string s in set)
+            {
+                if (dg.HasDependents(s))
+                {
+                    keepGoing = true;
+                }
+                directDependents.UnionWith(GetDirectDependents(s));
+            }
+
+            set.UnionWith(directDependents);
+
+            return keepGoing ? GetAllDependentsRecursive(set) : set;
         }
 
         /// <summary>
@@ -188,9 +260,11 @@ namespace SS
                 throw new InvalidNameException();
             }
 
-            foreach (string dependentName in dg.GetDependents(name))
+            var normalizedName = name.ToUpper();
+
+            foreach (string dependentName in dg.GetDependents(normalizedName))
             {               
-                yield return dependentName;
+                yield return dependentName.ToUpper();
             }
         }
 
@@ -235,9 +309,9 @@ namespace SS
             private object value;
 
             /// <summary>
-            /// Creates an empty cell.
+            /// Creates an empty cell with the given name
             /// </summary>
-            private Cell(string name)
+            internal Cell(string name)
             {
                 if (!cellNameRegex.IsMatch(name))
                 {
@@ -247,6 +321,15 @@ namespace SS
                 this.name = name;
                 contents = "";
                 value = "";
+            }
+
+            /// <summary>
+            /// Creates a new cell with the given name and contents
+            /// </summary>
+            internal Cell(string name, object contents)
+                : this(name)
+            {
+                this.contents = contents;
             }
 
             public string Name
