@@ -164,6 +164,7 @@ namespace SS
 
             ISet<string> result = TryUpdateDependencies(normalizedName, contents);
 
+            // Update the cell contents, or create a new cell if it doesn't already exist
             Cell c;
             if (cells.TryGetValue(normalizedName, out c))
             {
@@ -178,12 +179,17 @@ namespace SS
         }
 
         /// <summary>
-        /// TODO doc comment for TryUpdateDependencies
+        /// If the contents is a Formula that results in a circular reference, throws a CircularException
+        /// Otherwise, replaces the dependents of the named cell with the new dependents in Formula.
+        /// For all contents, returns a set consisting of name plus the names of all other cells
+        /// whose value depends, directly or indirectly, on the named cell.
         /// </summary>
         private ISet<string> TryUpdateDependencies(string name, object contents)
         {
             ISet<string> result = new HashSet<string>();
-            List<string> previousDependents = dg.GetDependents(name).ToList(); // restore these later if a circular reference is found
+
+            // Save dependencies so they can be restored later if a circular reference is found
+            List<string> previousDependents = dg.GetDependents(name).ToList();
 
             try {
                 // If contents is a Formula, add any dependencies to dg
@@ -194,11 +200,11 @@ namespace SS
                 }                
                 result.UnionWith(GetCellsToRecalculate(name)); // throws exception if a circular reference is found
             }
-            catch (CircularException e)
+            catch (CircularException)
             {
                 // Restore the previous dependents, then re-throw the exception
                 dg.ReplaceDependents(name, previousDependents);
-                throw e;
+                throw;
             }
 
             return result;
@@ -254,26 +260,6 @@ namespace SS
             private string name;
 
             /// <summary>
-            /// The contents of a cell can be (1) a string, (2) a double, or (3) a Formula.  If the
-            /// contents is an empty string, we say that the cell is empty.  (By analogy, the contents
-            /// of a cell in Excel is what is displayed on the editing line when the cell is selected.)
-            /// 
-            /// In an empty spreadsheet, the contents of every cell is the empty string.
-            ///  
-            /// If a cell's contents is a string, its value is that string.
-            /// 
-            /// If a cell's contents is a double, its value is that double.
-            /// 
-            /// If a cell's contents is a Formula, its value is either a double or a FormulaError.
-            /// The value of a Formula, of course, can depend on the values of variables.  The value 
-            /// of a Formula variable is the value of the spreadsheet cell it names (if that cell's 
-            /// value is a double) or is undefined (otherwise).  If a Formula depends on an undefined
-            /// variable or on a division by zero, its value is a FormulaError.  Otherwise, its value
-            /// is a double, as specified in Formula.Evaluate.
-            /// </summary>
-            private object contents;
-
-            /// <summary>
             /// The value of a cell can be (1) a string, (2) a double, or (3) a FormulaError.  
             /// (By analogy, the value of an Excel cell is what is displayed in that cell's position
             /// in the grid.)
@@ -291,7 +277,7 @@ namespace SS
                 }
 
                 this.name = name;
-                contents = "";
+                Contents = "";
                 value = "";
             }
 
@@ -301,17 +287,28 @@ namespace SS
             internal Cell(string name, object contents)
                 : this(name)
             {
-                this.contents = contents;
+                Contents = contents;
             }
 
             /// <summary>
-            /// Exposes the contents of this Cell.
+            /// The contents of a cell can be (1) a string, (2) a double, or (3) a Formula.  If the
+            /// contents is an empty string, we say that the cell is empty.  (By analogy, the contents
+            /// of a cell in Excel is what is displayed on the editing line when the cell is selected.)
+            /// 
+            /// In an empty spreadsheet, the contents of every cell is the empty string.
+            ///  
+            /// If a cell's contents is a string, its value is that string.
+            /// 
+            /// If a cell's contents is a double, its value is that double.
+            /// 
+            /// If a cell's contents is a Formula, its value is either a double or a FormulaError.
+            /// The value of a Formula, of course, can depend on the values of variables.  The value 
+            /// of a Formula variable is the value of the spreadsheet cell it names (if that cell's 
+            /// value is a double) or is undefined (otherwise).  If a Formula depends on an undefined
+            /// variable or on a division by zero, its value is a FormulaError.  Otherwise, its value
+            /// is a double, as specified in Formula.Evaluate.
             /// </summary>
-            public object Contents
-            {
-                get { return contents; }
-                internal set { contents = value; }
-            }
+            internal object Contents { get; set; }
         }
     }
 }
