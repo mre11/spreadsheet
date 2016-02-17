@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Formulas;
 using System.Text.RegularExpressions;
 using Dependencies;
+using System.Linq;
 
 namespace SS
 {
@@ -161,14 +162,7 @@ namespace SS
 
             var normalizedName = name.ToUpper();
 
-            // If contents is a Formula, add any dependencies to dg
-            if (contents.GetType() == typeof(Formula))
-            {
-                dg.ReplaceDependents(normalizedName, ((Formula) contents).GetVariables());
-            }
-
-            ISet<string> result = new HashSet<string>();
-            result.UnionWith(GetCellsToRecalculate(normalizedName));
+            ISet<string> result = TryUpdateDependencies(normalizedName, contents);
 
             Cell c;
             if (cells.TryGetValue(normalizedName, out c))
@@ -178,6 +172,33 @@ namespace SS
             else
             {
                 cells.Add(normalizedName, new Cell(normalizedName, contents));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// TODO doc comment for TryUpdateDependencies
+        /// </summary>
+        private ISet<string> TryUpdateDependencies(string name, object contents)
+        {
+            ISet<string> result = new HashSet<string>();
+            List<string> previousDependents = dg.GetDependents(name).ToList(); // restore these later if a circular reference is found
+
+            try {
+                // If contents is a Formula, add any dependencies to dg
+                if (contents.GetType() == typeof(Formula))
+                {
+                    Formula formulaContents = (Formula) contents;
+                    dg.ReplaceDependents(name, formulaContents.GetVariables());
+                }                
+                result.UnionWith(GetCellsToRecalculate(name)); // throws exception if a circular reference is found
+            }
+            catch (CircularException e)
+            {
+                // Restore the previous dependents, then re-throw the exception
+                dg.ReplaceDependents(name, previousDependents);
+                throw e;
             }
 
             return result;
