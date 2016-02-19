@@ -35,7 +35,7 @@ namespace SS
         /// <summary>
         /// A Spreadsheet is set of Cells that can be looked up by name
         /// </summary>
-        private Dictionary<string,Cell> cells;
+        private Dictionary<string, Cell> cells;
 
         /// <summary>
         /// Tracks the dependencies among cells in the spreadsheet
@@ -43,12 +43,16 @@ namespace SS
         private DependencyGraph dg;
 
         /// <summary>
-        /// Defines the allowed pattern for a cell name.
         /// A string is a cell name if and only if it consists of one or more letters, 
         /// followed by a non-zero digit, followed by zero or more digits.  Cell names
         /// are not case sensitive.
         /// </summary>
-        static Regex allowedCellName = new Regex(@"[a-zA-z]+[1-9]+\d*");
+        private static bool IsValidCellName(string name)
+        {
+            Regex allowedCellName = new Regex(@"[a-zA-z]+[1-9]+\d*");
+
+            return allowedCellName.IsMatch(name);
+        }
 
         /// <summary>
         /// Creates an empty Spreadsheet
@@ -78,7 +82,7 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            if (name == null || !allowedCellName.IsMatch(name))
+            if (name == null || !IsValidCellName(name))
             {
                 throw new InvalidNameException();
             }
@@ -155,7 +159,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null || !allowedCellName.IsMatch(name))
+            else if (name == null || !IsValidCellName(name))
             {
                 throw new InvalidNameException();
             }
@@ -233,7 +237,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (!allowedCellName.IsMatch(name))
+            else if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
             }
@@ -271,7 +275,7 @@ namespace SS
             /// </summary>
             internal Cell(string name)
             {
-                if (!allowedCellName.IsMatch(name))
+                if (!IsValidCellName(name))
                 {
                     throw new InvalidNameException();
                 }
