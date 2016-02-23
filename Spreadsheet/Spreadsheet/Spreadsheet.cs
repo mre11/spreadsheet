@@ -14,7 +14,7 @@ namespace SS
     /// 
     /// A string is a cell name if and only if it consists of one or more letters, 
     /// followed by a non-zero digit, followed by zero or more digits.  Cell names
-    /// are not case sensitive.
+    /// are not case sensitive. @"^[a-zA-z]+[1-9]+\d*$"
     /// 
     /// For example, "A15", "a15", "XY32", and "BC7" are cell names.  (Note that 
     /// "A15" and "a15" name the same cell.)  On the other hand, "Z", "X07", and 
@@ -43,6 +43,8 @@ namespace SS
         /// </summary>
         private DependencyGraph dg;
 
+        private Regex IsValid { get; set; }
+
         /// <summary>
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
@@ -50,25 +52,37 @@ namespace SS
         public override bool Changed { get; protected set; }
 
         /// <summary>
-        /// A string is a cell name if and only if it consists of one or more letters, 
-        /// followed by a non-zero digit, followed by zero or more digits.  Cell names
-        /// are not case sensitive.
-        /// </summary>
-        private static bool IsValidCellName(string name)
-        {
-            Regex allowedCellName = new Regex(@"^[a-zA-z]+[1-9]+\d*$");
-
-            return allowedCellName.IsMatch(name);
-        }
-
-        /// <summary>
-        /// Creates an empty Spreadsheet
+        /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.
         /// </summary>
         public Spreadsheet()
         {
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
+            IsValid = new Regex(@".*");
             Changed = false;
+        }
+
+        /// <summary>
+        /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
+        /// </summary>
+        public Spreadsheet(Regex isValid)
+            : this()
+        {
+            IsValid = isValid;
+        }
+
+        /// <summary>
+        /// Creates a Spreadsheet that is a duplicate of the spreadsheet saved in source.
+        /// See the AbstractSpreadsheet.Save method and Spreadsheet.xsd for the file format 
+        /// specification.  If there's a problem reading source, throws an IOException
+        /// If the contents of source are not consistent with the schema in Spreadsheet.xsd, 
+        /// throws a SpreadsheetReadException.  If there is an invalid cell name, or a 
+        /// duplicate cell name, or an invalid formula in the source, throws a SpreadsheetReadException.
+        /// If there's a Formula that causes a circular dependency, throws a SpreadsheetReadException.
+        /// </summary>
+        public Spreadsheet(TextReader source)
+        {
+            // TODO Spreadsheet TextReader constructor (tests and implementation)
         }
 
         /// <summary>
@@ -93,7 +107,7 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            if (name == null || !IsValidCellName(name))
+            if (name == null || !IsValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -162,19 +176,11 @@ namespace SS
         }
 
         /// <summary>
-        /// Helper method for SetCellContents protected methods
+        /// Helper method for SetCellContents protected methods. Method assumes that
+        /// the caller has already checked for null and invalid parameters.
         /// </summary>
         private ISet<string> SetCellContents(string name, object contents)
         {
-            if (contents == null)
-            {
-                throw new ArgumentNullException();
-            }
-            else if (name == null || !IsValidCellName(name))
-            {
-                throw new InvalidNameException();
-            }
-
             var normalizedName = name.ToUpper();
 
             ISet<string> result = TryUpdateDependencies(normalizedName, contents);
@@ -296,7 +302,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (!IsValidCellName(name))
+            else if (!IsValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -330,7 +336,7 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            // TODO implement Save
+            // TODO write tests and implement Save
             Changed = false;
             throw new NotImplementedException();
         }
@@ -343,7 +349,8 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            if (name == null || !IsValidCellName(name))
+            // TODO implement GetCellValue
+            if (name == null || !IsValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -396,7 +403,7 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null || !IsValidCellName(name))
+            else if (name == null || !IsValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
@@ -408,7 +415,7 @@ namespace SS
             }
             else if (content.Length > 0 && content[0] == '=')
             {
-                return SetCellContents(name, new Formula(content.Substring(1), s => s.ToUpper(), IsValidCellName));                
+                return SetCellContents(name, new Formula(content.Substring(1), s => s.ToUpper(), IsValid.IsMatch));                
             }
 
             return SetCellContents(name, content);            
@@ -455,15 +462,10 @@ namespace SS
             internal object Value { get; set; }
 
             /// <summary>
-            /// Creates an empty cell with the given name
+            /// Creates an empty cell with the given name. Does not check the name for validity.
             /// </summary>
             internal Cell(string name)
             {
-                if (!IsValidCellName(name))
-                {
-                    throw new InvalidNameException();
-                }
-
                 this.name = name;
                 Contents = "";
             }

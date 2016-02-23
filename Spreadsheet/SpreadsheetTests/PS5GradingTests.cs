@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using Formulas;
+using System.Text.RegularExpressions;
 
 namespace GradingTests
 {
@@ -49,7 +50,7 @@ namespace GradingTests
         [ExpectedException(typeof(InvalidNameException))]
         public void Test2()
         {
-            AbstractSpreadsheet s = new Spreadsheet();
+            AbstractSpreadsheet s = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             s.GetCellContents("AA");
         }
 
@@ -73,7 +74,7 @@ namespace GradingTests
         [ExpectedException(typeof(InvalidNameException))]
         public void Test5()
         {
-            AbstractSpreadsheet s = new Spreadsheet();
+            AbstractSpreadsheet s = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             s.SetContentsOfCell("A1A", "1.5");
         }
 
@@ -106,7 +107,7 @@ namespace GradingTests
         [ExpectedException(typeof(InvalidNameException))]
         public void Test9()
         {
-            AbstractSpreadsheet s = new Spreadsheet();
+            AbstractSpreadsheet s = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             s.SetContentsOfCell("AZ", "hello");
         }
 
@@ -131,7 +132,7 @@ namespace GradingTests
         [ExpectedException(typeof(InvalidNameException))]
         public void Test12()
         {
-            AbstractSpreadsheet s = new Spreadsheet();
+            AbstractSpreadsheet s = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             s.SetContentsOfCell("AZ", "=2");
         }
 

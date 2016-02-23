@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SS
 {
@@ -59,7 +59,7 @@ namespace SS
         [ExpectedException(typeof(InvalidNameException))]
         public void TestGetCellContents2()
         {
-            var ss = new Spreadsheet();
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             ss.GetCellContents("a01");
         }
 
@@ -121,7 +121,7 @@ namespace SS
         [ExpectedException(typeof(InvalidNameException))]
         public void TestSetCellContents3()
         {
-            var ss = new Spreadsheet();
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             ss.SetContentsOfCell("a01", "hello");
         }
 
@@ -181,22 +181,12 @@ namespace SS
         }        
 
         /// <summary>
-        /// Tests method for null parameter
+        /// TODO write tests for GetCellValue
         /// </summary>
         [TestMethod]
-        public void TestGetDirectDependents3()
+        public void TestGetCellValue1()
         {
             var ss = new Spreadsheet();
-            ss.SetContentsOfCell("a1", "=a2");
-            ss.SetContentsOfCell("a2", "hello world");
-
-            PrivateObject ssAccessor = new PrivateObject(ss);
-
-            object[] parameters = { "a2" };
-            List<string> result = ((IEnumerable<string>) ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
-
-            Assert.AreEqual(1, result.Count);
-            Assert.IsTrue(result.Contains("A1"));
         }
 
         /// <summary>
