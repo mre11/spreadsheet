@@ -31,9 +31,9 @@ namespace SS
         public void TestGetNamesOfAllNonemptyCells2()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", "hello");
-            ss.SetCellContents("a2", "what");
-            ss.SetCellContents("a3", "42");
+            ss.SetContentsOfCell("a1", "hello");
+            ss.SetContentsOfCell("a2", "what");
+            ss.SetContentsOfCell("a3", "42");
             var list = ss.GetNamesOfAllNonemptyCells().ToList();
 
             Assert.AreEqual(3, list.Count);
@@ -82,10 +82,10 @@ namespace SS
         public void TestGetCellContents4()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", "hello");
-            ss.SetCellContents("a2", 0.55);
-            ss.SetCellContents("a3", new Formula("a2"));
-            ss.SetCellContents("a4", new Formula("3 + 4"));
+            ss.SetContentsOfCell("a1", "hello");
+            ss.SetContentsOfCell("a2", "0.55");
+            ss.SetContentsOfCell("a3", "=a2");
+            ss.SetContentsOfCell("a4", "=3 + 4");
 
             Assert.AreEqual("hello", ss.GetCellContents("a1"));
             Assert.AreEqual(0.55, ss.GetCellContents("A2"));
@@ -101,7 +101,7 @@ namespace SS
         public void TestSetCellContents1()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", null);
+            ss.SetContentsOfCell("a1", null);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace SS
         public void TestSetCellContents2()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents(null, "hello");
+            ss.SetContentsOfCell(null, "hello");
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace SS
         public void TestSetCellContents3()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a01", "hello");
+            ss.SetContentsOfCell("a01", "hello");
         }
 
         /// <summary>
@@ -134,8 +134,8 @@ namespace SS
         public void TestSetCellContents4()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, s => true));
-            ss.SetCellContents("A4", new Formula("a3 + 5", UpperCaseNormalizer, s => true));
+            ss.SetContentsOfCell("a3", "=a4 + 11");
+            ss.SetContentsOfCell("A4", "=a3 + 5");
         }
 
         /// <summary>
@@ -145,17 +145,17 @@ namespace SS
         public void TestSetCellContents5()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", "hello");
+            ss.SetContentsOfCell("a1", "hello");
 
             Assert.AreEqual("hello", ss.GetCellContents("a1"));
 
-            ss.SetCellContents("A2", 11);
+            ss.SetContentsOfCell("A2", "11");
 
             Assert.AreEqual(11d, ss.GetCellContents("a2"));
 
-            var set1 = ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, s => true));
-            var set2 = ss.SetCellContents("A4", new Formula("a2 + 5", UpperCaseNormalizer, s => true));
-            var set3 = ss.SetCellContents("a5", new Formula("a2 + a3 + a4", UpperCaseNormalizer, s => true));
+            var set1 = ss.SetContentsOfCell("a3", "=a4 + 11");
+            var set2 = ss.SetContentsOfCell("A4", "=a2 + 5");
+            var set3 = ss.SetContentsOfCell("a5", "=a2 + a3 + a4");
 
             Assert.AreEqual(1, set1.Count);
             Assert.IsTrue(set1.Contains("A3"));
@@ -175,8 +175,8 @@ namespace SS
         public void TestSetCellContents6()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a3", new Formula("a4 + 11"));
-            ss.SetCellContents("a3", "hello");
+            ss.SetContentsOfCell("a3", "=a4 + 11");
+            ss.SetContentsOfCell("a3", "hello");
 
             Assert.AreEqual("hello", ss.GetCellContents("A3"));
         }
@@ -216,8 +216,8 @@ namespace SS
         public void TestGetDirectDependents3()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", new Formula("a2", UpperCaseNormalizer, s => true));
-            ss.SetCellContents("a2", "hello world");
+            ss.SetContentsOfCell("a1", "=a2");
+            ss.SetContentsOfCell("a2", "hello world");
 
             PrivateObject ssAccessor = new PrivateObject(ss);
 
