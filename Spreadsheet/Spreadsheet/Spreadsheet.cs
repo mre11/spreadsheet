@@ -47,18 +47,7 @@ namespace SS
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
         /// </summary>
-        public override bool Changed
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            protected set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public override bool Changed { get; protected set; }
 
         /// <summary>
         /// A string is a cell name if and only if it consists of one or more letters, 
@@ -79,6 +68,7 @@ namespace SS
         {
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
+            Changed = false;
         }
 
         /// <summary>
@@ -169,7 +159,7 @@ namespace SS
         }
 
         /// <summary>
-        /// Helper method for SetCellContents public methods
+        /// Helper method for SetCellContents protected methods
         /// </summary>
         private ISet<string> SetCellContents(string name, object contents)
         {
@@ -196,6 +186,10 @@ namespace SS
             {
                 cells.Add(normalizedName, new Cell(normalizedName, contents));
             }
+
+            RecalculateCellValues(normalizedName);
+
+            this.Changed = true;
 
             return result;
         }
@@ -230,6 +224,50 @@ namespace SS
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// TODO doc comment
+        /// </summary>
+        /// <param name="name"></param>
+        private void RecalculateCellValues(string name)
+        {
+            foreach (string cellName in GetCellsToRecalculate(name))
+            {
+                Cell c;
+                if (cells.TryGetValue(cellName, out c))
+                {
+                    if (c.Contents.GetType() == typeof(string) || c.Contents.GetType() == typeof(double))
+                    {
+                        c.Value = c.Contents;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            c.Value = ((Formula)c.Contents).Evaluate(CellValueLookup);
+                        }
+                        catch(Exception e)
+                        {
+                            c.Value = new FormulaError(e.Message); // TODO a better reason for FormulaError?
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// TODO doc comment
+        /// </summary>
+        private double CellValueLookup(string cellName)
+        {
+            Cell c;
+            if (cells.TryGetValue(cellName, out c))
+            {
+                return (double) c.Value;
+            }
+
+            throw new FormulaEvaluationException("Cell reference not found");
         }
 
         /// <summary>
@@ -289,6 +327,8 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
+            // TODO implement Save
+            Changed = false;
             throw new NotImplementedException();
         }
 
@@ -300,7 +340,20 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            throw new NotImplementedException();
+            if (name == null || !IsValidCellName(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            Cell c;
+            if (cells.TryGetValue(name, out c))
+            {
+                return c.Value;
+            }
+            else
+            {
+                return "";
+            }
         }
 
         /// <summary>
@@ -344,13 +397,19 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            
+            double doubleContent;
+            if (double.TryParse(content, out doubleContent))
+            {
+                return SetCellContents(name, doubleContent);
+            }
+            else if (content[0] == '=')
+            {
+                return SetCellContents(name, new Formula(content, s => s.ToUpper(), IsValidCellName));
+                
+            }
 
-
-
-
-
-
-            throw new NotImplementedException();
+            return SetCellContents(name, content);            
         }
 
         /// <summary>
@@ -365,37 +424,6 @@ namespace SS
             /// are not case sensitive.
             /// </summary>
             private string name;
-
-            /// <summary>
-            /// The value of a cell can be (1) a string, (2) a double, or (3) a FormulaError.  
-            /// (By analogy, the value of an Excel cell is what is displayed in that cell's position
-            /// in the grid.)
-            /// </summary>
-            private object value;
-
-            /// <summary>
-            /// Creates an empty cell with the given name
-            /// </summary>
-            internal Cell(string name)
-            {
-                if (!IsValidCellName(name))
-                {
-                    throw new InvalidNameException();
-                }
-
-                this.name = name;
-                Contents = "";
-                value = "";
-            }
-
-            /// <summary>
-            /// Creates a new cell with the given name and contents
-            /// </summary>
-            internal Cell(string name, object contents)
-                : this(name)
-            {
-                Contents = contents;
-            }
 
             /// <summary>
             /// The contents of a cell can be (1) a string, (2) a double, or (3) a Formula.  If the
@@ -416,6 +444,36 @@ namespace SS
             /// is a double, as specified in Formula.Evaluate.
             /// </summary>
             internal object Contents { get; set; }
+
+            /// <summary>
+            /// The value of a cell can be (1) a string, (2) a double, or (3) a FormulaError.  
+            /// (By analogy, the value of an Excel cell is what is displayed in that cell's position
+            /// in the grid.)
+            /// </summary>
+            internal object Value { get; set; }
+
+            /// <summary>
+            /// Creates an empty cell with the given name
+            /// </summary>
+            internal Cell(string name)
+            {
+                if (!IsValidCellName(name))
+                {
+                    throw new InvalidNameException();
+                }
+
+                this.name = name;
+                Contents = "";
+            }
+
+            /// <summary>
+            /// Creates a new cell with the given name and contents
+            /// </summary>
+            internal Cell(string name, object contents)
+                : this(name)
+            {
+                Contents = contents;
+            }
         }
     }
 }
