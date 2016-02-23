@@ -178,15 +178,119 @@ namespace SS
             ss.SetContentsOfCell("a3", "hello");
 
             Assert.AreEqual("hello", ss.GetCellContents("A3"));
-        }        
+        }
 
         /// <summary>
-        /// TODO write tests for GetCellValue
+        /// Tests method for a null name
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
         public void TestGetCellValue1()
         {
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
+            ss.GetCellValue(null);
+        }
+
+        /// <summary>
+        /// Tests method for an invalid name
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestGetCellValue2()
+        {
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
+            ss.GetCellValue("AA23B");
+        }
+
+        /// <summary>
+        /// Tests method for an empty cell
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue3()
+        {
             var ss = new Spreadsheet();
+            Assert.AreEqual("", ss.GetCellValue("A42"));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a string
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue4()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "hello");
+            Assert.AreEqual("hello", ss.GetCellValue("A1"));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a double
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue5()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "2.54");
+            Assert.AreEqual(2.54, ss.GetCellValue("A1"));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a valid Formula
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue6()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "2.54");
+            ss.SetContentsOfCell("B52", "=A1*3");
+            Assert.AreEqual(2.54*3, ss.GetCellValue("B52"));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a bad Formula
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue7()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "hello, world");
+            ss.SetContentsOfCell("B2", "=A1*3");
+            Assert.IsTrue(ss.GetCellValue("B2").GetType() == typeof(FormulaError));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a bad Formula (reference to an empty cell)
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue8()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("B2", "=A1*3");
+            Assert.IsTrue(ss.GetCellValue("B2").GetType() == typeof(FormulaError));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a bad Formula (reference to an empty cell)
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue9()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "");
+            ss.SetContentsOfCell("B2", "=A1*3");
+            Assert.IsTrue(ss.GetCellValue("B2").GetType() == typeof(FormulaError));
+        }
+
+        /// <summary>
+        /// Tests method for a cell containing a bad Formula (divide by zero)
+        /// </summary>
+        [TestMethod]
+        public void TestGetCellValue10()
+        {
+            var ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "0");
+            ss.SetContentsOfCell("B2", "=2.54/A1");
+            Assert.IsTrue(ss.GetCellValue("B2").GetType() == typeof(FormulaError));
         }
 
         /// <summary>

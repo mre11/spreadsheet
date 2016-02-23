@@ -236,9 +236,9 @@ namespace SS
         }
 
         /// <summary>
-        /// TODO doc comment
+        /// Recalculates the value of the cell specified by name, as well as all cells that
+        /// depend directly or indirectly on the cell.
         /// </summary>
-        /// <param name="name"></param>
         private void RecalculateCellValues(string name)
         {
             foreach (string cellName in GetCellsToRecalculate(name))
@@ -258,7 +258,7 @@ namespace SS
                         }
                         catch(Exception e)
                         {
-                            c.Value = new FormulaError(e.Message); // TODO a better reason for FormulaError?
+                            c.Value = new FormulaError(e.Message);
                         }
                     }
                 }
@@ -266,7 +266,7 @@ namespace SS
         }
 
         /// <summary>
-        /// TODO doc comment
+        /// Returns the value of a cell given its name
         /// </summary>
         private double CellValueLookup(string cellName)
         {
@@ -349,7 +349,6 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            // TODO implement GetCellValue
             if (name == null || !IsValid.IsMatch(name))
             {
                 throw new InvalidNameException();
