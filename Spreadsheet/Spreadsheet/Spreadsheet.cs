@@ -56,7 +56,7 @@ namespace SS
         /// </summary>
         private static bool IsValidCellName(string name)
         {
-            Regex allowedCellName = new Regex(@"[a-zA-z]+[1-9]+\d*");
+            Regex allowedCellName = new Regex(@"^[a-zA-z]+[1-9]+\d*$");
 
             return allowedCellName.IsMatch(name);
         }
@@ -78,8 +78,11 @@ namespace SS
         {
             foreach (KeyValuePair<string, Cell> kvp in cells)
             {
+                if (!kvp.Value.IsEmpty())
+                {
                 yield return kvp.Key;
             }
+        }
         }
 
         /// <summary>
@@ -205,21 +208,21 @@ namespace SS
             ISet<string> result = new HashSet<string>();
 
             // Save dependencies so they can be restored later if a circular reference is found
-            List<string> previousDependents = dg.GetDependents(name).ToList();
+            List<string> previousDependees = dg.GetDependents(name).ToList();
 
             try {
                 // If contents is a Formula, add any dependencies to dg
                 if (contents.GetType() == typeof(Formula))
                 {
                     Formula formulaContents = (Formula) contents;
-                    dg.ReplaceDependents(name, formulaContents.GetVariables());
+                    dg.ReplaceDependees(name, formulaContents.GetVariables());
                 }                
                 result.UnionWith(GetCellsToRecalculate(name)); // throws exception if a circular reference is found
             }
             catch (CircularException)
             {
                 // Restore the previous dependents, then re-throw the exception
-                dg.ReplaceDependents(name, previousDependents);
+                dg.ReplaceDependees(name, previousDependees);
                 throw;
             }
 
@@ -473,6 +476,14 @@ namespace SS
                 : this(name)
             {
                 Contents = contents;
+            }
+
+            /// <summary>
+            /// Returns true if the Contents of this Cell is the empty string.
+            /// </summary>
+            internal bool IsEmpty()
+            {
+                return this.Contents.GetType() == typeof(string) && (string)this.Contents == "";
             }
         }
     }

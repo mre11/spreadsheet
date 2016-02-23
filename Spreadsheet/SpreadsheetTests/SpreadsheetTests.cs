@@ -134,8 +134,8 @@ namespace SS
         public void TestSetCellContents4()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a3", new Formula("a4 + 11"));
-            ss.SetCellContents("A4", new Formula("a3 + 5"));
+            ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, s => true));
+            ss.SetCellContents("A4", new Formula("a3 + 5", UpperCaseNormalizer, s => true));
         }
 
         /// <summary>
@@ -153,22 +153,18 @@ namespace SS
 
             Assert.AreEqual(11d, ss.GetCellContents("a2"));
 
-            var set1 = ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, v => true));
-            var set2 = ss.SetCellContents("A4", new Formula("a2 + 5", UpperCaseNormalizer, v => true));
-            var set3 = ss.SetCellContents("a5", new Formula("a2 + a3 + a4", UpperCaseNormalizer, v => true));
+            var set1 = ss.SetCellContents("a3", new Formula("a4 + 11", UpperCaseNormalizer, s => true));
+            var set2 = ss.SetCellContents("A4", new Formula("a2 + 5", UpperCaseNormalizer, s => true));
+            var set3 = ss.SetCellContents("a5", new Formula("a2 + a3 + a4", UpperCaseNormalizer, s => true));
 
-            Assert.AreEqual(2, set1.Count);
+            Assert.AreEqual(1, set1.Count);
             Assert.IsTrue(set1.Contains("A3"));
-            Assert.IsTrue(set1.Contains("A4"));
 
             Assert.AreEqual(2, set2.Count);
-            Assert.IsTrue(set2.Contains("A2"));
+            Assert.IsTrue(set2.Contains("A3"));
             Assert.IsTrue(set2.Contains("A4"));
 
-            Assert.AreEqual(4, set3.Count);
-            Assert.IsTrue(set3.Contains("A2"));
-            Assert.IsTrue(set3.Contains("A3"));
-            Assert.IsTrue(set3.Contains("A4"));
+            Assert.AreEqual(1, set3.Count);
             Assert.IsTrue(set3.Contains("A5"));
         }
 
@@ -220,16 +216,16 @@ namespace SS
         public void TestGetDirectDependents3()
         {
             var ss = new Spreadsheet();
-            ss.SetCellContents("a1", new Formula("a2"));
+            ss.SetCellContents("a1", new Formula("a2", UpperCaseNormalizer, s => true));
             ss.SetCellContents("a2", "hello world");
 
             PrivateObject ssAccessor = new PrivateObject(ss);
 
-            object[] parameters = { "a1" };
+            object[] parameters = { "a2" };
             List<string> result = ((IEnumerable<string>) ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
 
             Assert.AreEqual(1, result.Count);
-            Assert.IsTrue(result.Contains("A2"));
+            Assert.IsTrue(result.Contains("A1"));
         }
 
         /// <summary>
