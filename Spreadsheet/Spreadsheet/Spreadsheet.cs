@@ -92,11 +92,9 @@ namespace SS
         {
             foreach (KeyValuePair<string, Cell> kvp in cells)
             {
-                if (!kvp.Value.IsEmpty())
-                {
                 yield return kvp.Key;
             }
-        }
+        
         }
 
         /// <summary>
@@ -189,11 +187,21 @@ namespace SS
             Cell c;
             if (cells.TryGetValue(normalizedName, out c))
             {
-                c.Contents = contents;
+                if (contents.GetType() == typeof(string) && (string)contents == "")
+                {
+                    cells.Remove(normalizedName); // empty string means empty cell; just remove it.
+                }
+                else
+                {
+                    c.Contents = contents;
+                }                
             }
             else
             {
-                cells.Add(normalizedName, new Cell(normalizedName, contents));
+                if (contents.GetType() != typeof(string) || (string)contents != "") // don't add an empty cell
+                {
+                    cells.Add(normalizedName, new Cell(normalizedName, contents));
+                }
             }
 
             RecalculateCellValues(normalizedName);
@@ -476,14 +484,6 @@ namespace SS
                 : this(name)
             {
                 Contents = contents;
-            }
-
-            /// <summary>
-            /// Returns true if the Contents of this Cell is the empty string.
-            /// </summary>
-            internal bool IsEmpty()
-            {
-                return this.Contents.GetType() == typeof(string) && (string)this.Contents == "";
             }
         }
     }
