@@ -294,6 +294,15 @@ namespace SS
         }
 
         /// <summary>
+        /// TODO start Save tests
+        /// </summary>
+        [TestMethod]
+        public void TestSave1()
+        {
+            var ss = new Spreadsheet();
+        }
+
+        /// <summary>
         /// Returns the upper-case version of s
         /// </summary>
         public string UpperCaseNormalizer(string s)

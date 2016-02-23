@@ -82,7 +82,8 @@ namespace SS
         /// </summary>
         public Spreadsheet(TextReader source)
         {
-            // TODO Spreadsheet TextReader constructor (tests and implementation)
+            // TODO write tests and implement Spreadsheet TextReader constructor
+            throw new NotImplementedException();
         }
 
         /// <summary>
