@@ -406,10 +406,9 @@ namespace SS
             {
                 return SetCellContents(name, doubleContent);
             }
-            else if (content[0] == '=')
+            else if (content.Length > 0 && content[0] == '=')
             {
-                return SetCellContents(name, new Formula(content, s => s.ToUpper(), IsValidCellName));
-                
+                return SetCellContents(name, new Formula(content.Substring(1), s => s.ToUpper(), IsValidCellName));                
             }
 
             return SetCellContents(name, content);            

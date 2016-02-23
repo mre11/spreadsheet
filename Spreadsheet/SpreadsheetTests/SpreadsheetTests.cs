@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using Formulas;
 using System.Collections.Generic;
 
 namespace SS
@@ -89,7 +88,7 @@ namespace SS
 
             Assert.AreEqual("hello", ss.GetCellContents("a1"));
             Assert.AreEqual(0.55, ss.GetCellContents("A2"));
-            Assert.AreEqual("a2", ss.GetCellContents("a3").ToString());
+            Assert.AreEqual("A2", ss.GetCellContents("a3").ToString());
             Assert.AreEqual("3+4", ss.GetCellContents("A4").ToString());
         }
 
@@ -179,35 +178,7 @@ namespace SS
             ss.SetContentsOfCell("a3", "hello");
 
             Assert.AreEqual("hello", ss.GetCellContents("A3"));
-        }
-
-        /// <summary>
-        /// Tests method for null parameter
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void TestGetDirectDependents1()
-        {
-            var ss = new Spreadsheet();
-            PrivateObject ssAccessor = new PrivateObject(ss);
-
-            object[] parameters = { null };
-            List<string> result = ((IEnumerable<string>)ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
-        }
-
-        /// <summary>
-        /// Tests method for null parameter
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(InvalidNameException))]
-        public void TestGetDirectDependents2()
-        {
-            var ss = new Spreadsheet();
-            PrivateObject ssAccessor = new PrivateObject(ss);
-
-            object[] parameters = { "test" };
-            List<string> result = ((IEnumerable<string>)ssAccessor.Invoke("GetDirectDependents", parameters)).ToList();
-        }
+        }        
 
         /// <summary>
         /// Tests method for null parameter
