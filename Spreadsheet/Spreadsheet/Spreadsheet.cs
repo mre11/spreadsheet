@@ -82,9 +82,26 @@ namespace SS
         /// If there's a Formula that causes a circular dependency, throws a SpreadsheetReadException.
         /// </summary>
         public Spreadsheet(TextReader source)
-        {
-            // TODO write tests and implement Spreadsheet TextReader constructor
-            throw new NotImplementedException();
+            : this()
+        {            
+            using (var reader = XmlReader.Create(source))
+            {
+                while (reader.Read())
+                {
+                    if (reader.IsStartElement())
+                    {
+                        switch (reader.Name)
+                        {
+                            case "spreadsheet":
+                                IsValid = new Regex(reader["IsValid"]);
+                                break;
+                            case "cell":
+                                SetContentsOfCell(reader["name"], reader["contents"]);
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -346,7 +363,7 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            using (XmlWriter writer = XmlWriter.Create(dest))
+            using (var writer = XmlWriter.Create(dest))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("spreadsheet");

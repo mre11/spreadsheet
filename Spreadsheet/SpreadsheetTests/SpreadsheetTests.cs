@@ -369,6 +369,8 @@ namespace SS
             Assert.AreEqual(baseline, output);
         }
 
+        // TODO write tests for Spreadsheet TextReader constructor
+
         /// <summary>
         /// Returns the upper-case version of s
         /// </summary>
