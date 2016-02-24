@@ -12,12 +12,14 @@ namespace SS
     [TestClass]
     public class SpreadsheetTests
     {
-        // TODO these folders need to be relative paths!!!
+        // Folder containing XML test data for reading
+        private const string DATA_FOLDER = @"..\..\..\TestData\XML\Data\";
+
         // Folder containing XML test baselines
-        private const string BASELINE_FOLDER = @"E:\Morgan\Development\cs3500\spreadsheet\Spreadsheet\TestData\XML\Baselines\";
+        private const string BASELINE_FOLDER = @"..\..\..\TestData\XML\Baselines\";
 
         // Folder for XML test output
-        private const string OUTPUT_FOLDER = @"E:\Morgan\Development\cs3500\spreadsheet\Spreadsheet\TestData\XML\Output\";
+        private const string OUTPUT_FOLDER = @"..\..\..\TestData\XML\Output\";
 
         /// <summary>
         /// Tests method for an empty spreadsheet
@@ -310,7 +312,7 @@ namespace SS
             var ss = new Spreadsheet();
 
             var baseFileName = "save1";
-            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".xml");
             ss.Save(outputWriter);
             outputWriter.Close();
 
@@ -326,7 +328,7 @@ namespace SS
             var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
 
             var baseFileName = "save2";
-            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".xml");
             ss.Save(outputWriter);
             outputWriter.Close();
 
@@ -346,7 +348,7 @@ namespace SS
             ss.SetContentsOfCell("D555", "=B22*10");
 
             var baseFileName = "save3";
-            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".xml");
             ss.Save(outputWriter);
             outputWriter.Close();
 
@@ -360,8 +362,8 @@ namespace SS
         /// </summary>
         private void CompareTestFiles(string baseFileName)
         {
-            var baselineReader = new StreamReader(BASELINE_FOLDER + baseFileName + "_base.txt");
-            var outputReader = new StreamReader(OUTPUT_FOLDER + baseFileName + ".txt");
+            var baselineReader = new StreamReader(BASELINE_FOLDER + baseFileName + "_base.xml");
+            var outputReader = new StreamReader(OUTPUT_FOLDER + baseFileName + ".xml");
 
             string baseline = baselineReader.ReadToEnd();
             string output = outputReader.ReadToEnd();
