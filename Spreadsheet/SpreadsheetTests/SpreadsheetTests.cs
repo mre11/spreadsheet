@@ -356,6 +356,17 @@ namespace SS
         }
 
         /// <summary>
+        /// TODO Test that exception is thrown if problem occurs while writing file?
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(IOException))]
+        public void TestSave4()
+        {
+            var ss = new Spreadsheet();
+            //ss.Save(outputWriter);
+        }
+
+        /// <summary>
         /// Asserts that the test output is equal to the baseline.
         /// The test output is assumed to be "baseFileName".txt
         /// The test baseline is assumed to be "baseFileName"_base.txt
@@ -372,6 +383,16 @@ namespace SS
         }
 
         // TODO write tests for Spreadsheet TextReader constructor
+        /// <summary>
+        /// Read in an empty spreadsheet with default IsValid.
+        /// </summary>
+        [TestMethod]
+        public void TestRead1()
+        {
+            var baseFileName = "read1";
+            var ss = new Spreadsheet(new StreamReader(DATA_FOLDER + baseFileName + ".xml"));
+                       
+        }
 
         /// <summary>
         /// Returns the upper-case version of s

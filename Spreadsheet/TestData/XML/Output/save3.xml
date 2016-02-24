@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><spreadsheet IsValid="^[a-zA-z]+[1-9]+\d*$"><cell name="A1" contents="hello" /><cell name="B22" contents="2.54" /><cell name="C100001" contents="=A1" /><cell name="D555" contents="=B22*10" /></spreadsheet>

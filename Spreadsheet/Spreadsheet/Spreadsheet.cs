@@ -75,15 +75,18 @@ namespace SS
         /// <summary>
         /// Creates a Spreadsheet that is a duplicate of the spreadsheet saved in source.
         /// See the AbstractSpreadsheet.Save method and Spreadsheet.xsd for the file format 
-        /// specification.  If there's a problem reading source, throws an IOException
-        /// If the contents of source are not consistent with the schema in Spreadsheet.xsd, 
-        /// throws a SpreadsheetReadException.  If there is an invalid cell name, or a 
-        /// duplicate cell name, or an invalid formula in the source, throws a SpreadsheetReadException.
-        /// If there's a Formula that causes a circular dependency, throws a SpreadsheetReadException.
+        /// specification.
+        ///     If there's a problem reading source, throws an IOException.
+        ///     If the contents of source are not consistent with the schema in Spreadsheet.xsd, 
+        ///         throws a SpreadsheetReadException.
+        ///     If there is an invalid cell name, or a duplicate cell name, or an invalid formula
+        ///         in the source, throws a SpreadsheetReadException.
+        ///     If there's a Formula that causes a circular dependency, throws a SpreadsheetReadException.
         /// </summary>
         public Spreadsheet(TextReader source)
             : this()
-        {            
+        {          
+            // TODO complete implementation of Spreadsheet TextReader constructor  
             using (var reader = XmlReader.Create(source))
             {
                 while (reader.Read())
@@ -363,30 +366,37 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            using (var writer = XmlWriter.Create(dest))
+            try
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("spreadsheet");
-                writer.WriteAttributeString("IsValid", IsValid.ToString());
-
-                foreach (KeyValuePair<string, Cell> kvp in cells)
+                using (var writer = XmlWriter.Create(dest))
                 {
-                    Cell c = kvp.Value;
-                    writer.WriteStartElement("cell");
-                    writer.WriteAttributeString("name", c.Name);
-                    if (c.Contents.GetType() == typeof(Formula))
-                    {
-                        writer.WriteAttributeString("contents", "=" + c.Contents.ToString());
-                    }
-                    else
-                    {
-                        writer.WriteAttributeString("contents", c.Contents.ToString());
-                    }
-                    writer.WriteEndElement();
-                }
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("spreadsheet");
+                    writer.WriteAttributeString("IsValid", IsValid.ToString());
 
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
+                    foreach (KeyValuePair<string, Cell> kvp in cells)
+                    {
+                        Cell c = kvp.Value;
+                        writer.WriteStartElement("cell");
+                        writer.WriteAttributeString("name", c.Name);
+                        if (c.Contents.GetType() == typeof(Formula))
+                        {
+                            writer.WriteAttributeString("contents", "=" + c.Contents.ToString());
+                        }
+                        else
+                        {
+                            writer.WriteAttributeString("contents", c.Contents.ToString());
+                        }
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+            }
+            catch (Exception)
+            {
+                throw new IOException("XML write failure");
             }
 
             Changed = false;
