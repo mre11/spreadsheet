@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace SS
 {
@@ -11,6 +12,13 @@ namespace SS
     [TestClass]
     public class SpreadsheetTests
     {
+        // TODO these folders need to be relative paths!!!
+        // Folder containing XML test baselines
+        private const string BASELINE_FOLDER = @"E:\Morgan\Development\cs3500\spreadsheet\Spreadsheet\TestData\XML\Baselines\";
+
+        // Folder for XML test output
+        private const string OUTPUT_FOLDER = @"E:\Morgan\Development\cs3500\spreadsheet\Spreadsheet\TestData\XML\Output\";
+
         /// <summary>
         /// Tests method for an empty spreadsheet
         /// </summary>
@@ -294,12 +302,71 @@ namespace SS
         }
 
         /// <summary>
-        /// TODO start Save tests
+        /// Save an empty spreadsheet with no IsValid
         /// </summary>
         [TestMethod]
         public void TestSave1()
         {
             var ss = new Spreadsheet();
+
+            var baseFileName = "save1";
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            ss.Save(outputWriter);
+            outputWriter.Close();
+
+            CompareTestFiles(baseFileName);
+        }
+
+        /// <summary>
+        /// Save an empty spreadsheet with IsValid
+        /// </summary>
+        [TestMethod]
+        public void TestSave2()
+        {
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
+
+            var baseFileName = "save2";
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            ss.Save(outputWriter);
+            outputWriter.Close();
+
+            CompareTestFiles(baseFileName);
+        }
+
+        /// <summary>
+        /// Save an empty spreadsheet with IsValid
+        /// </summary>
+        [TestMethod]
+        public void TestSave3()
+        {
+            var ss = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
+            ss.SetContentsOfCell("A1", "hello");
+            ss.SetContentsOfCell("B22", "2.54");
+            ss.SetContentsOfCell("C100001", "=A1");
+            ss.SetContentsOfCell("D555", "=B22*10");
+
+            var baseFileName = "save3";
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".txt");
+            ss.Save(outputWriter);
+            outputWriter.Close();
+
+            CompareTestFiles(baseFileName);
+        }
+
+        /// <summary>
+        /// Asserts that the test output is equal to the baseline.
+        /// The test output is assumed to be "baseFileName".txt
+        /// The test baseline is assumed to be "baseFileName"_base.txt
+        /// </summary>
+        private void CompareTestFiles(string baseFileName)
+        {
+            var baselineReader = new StreamReader(BASELINE_FOLDER + baseFileName + "_base.txt");
+            var outputReader = new StreamReader(OUTPUT_FOLDER + baseFileName + ".txt");
+
+            string baseline = baselineReader.ReadToEnd();
+            string output = outputReader.ReadToEnd();
+
+            Assert.AreEqual(baseline, output);
         }
 
         /// <summary>

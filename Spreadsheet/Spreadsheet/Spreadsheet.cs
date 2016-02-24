@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Dependencies;
 using System.Linq;
 using System.IO;
+using System.Xml;
 
 namespace SS
 {
@@ -14,7 +15,7 @@ namespace SS
     /// 
     /// A string is a cell name if and only if it consists of one or more letters, 
     /// followed by a non-zero digit, followed by zero or more digits.  Cell names
-    /// are not case sensitive. @"^[a-zA-z]+[1-9]+\d*$"
+    /// are not case sensitive. The corresponding Regex is @"^[a-zA-z]+[1-9]+\d*$"
     /// 
     /// For example, "A15", "a15", "XY32", and "BC7" are cell names.  (Note that 
     /// "A15" and "a15" name the same cell.)  On the other hand, "Z", "X07", and 
@@ -345,9 +346,33 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            // TODO write tests and implement Save
+            using (XmlWriter writer = XmlWriter.Create(dest))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("spreadsheet");
+                writer.WriteAttributeString("IsValid", IsValid.ToString());
+
+                foreach (KeyValuePair<string, Cell> kvp in cells)
+                {
+                    Cell c = kvp.Value;
+                    writer.WriteStartElement("cell");
+                    writer.WriteAttributeString("name", c.Name);
+                    if (c.Contents.GetType() == typeof(Formula))
+                    {
+                        writer.WriteAttributeString("contents", "=" + c.Contents.ToString());
+                    }
+                    else
+                    {
+                        writer.WriteAttributeString("contents", c.Contents.ToString());
+                    }
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+
             Changed = false;
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -440,7 +465,7 @@ namespace SS
             /// followed by a non-zero digit, followed by zero or more digits.  Cell names
             /// are not case sensitive.
             /// </summary>
-            private string name;
+            internal string Name { get; set; }
 
             /// <summary>
             /// The contents of a cell can be (1) a string, (2) a double, or (3) a Formula.  If the
@@ -474,7 +499,7 @@ namespace SS
             /// </summary>
             internal Cell(string name)
             {
-                this.name = name;
+                Name = name;
                 Contents = "";
             }
 
