@@ -54,7 +54,7 @@ namespace SS
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
         /// </summary>
-        public override bool Changed { get; protected set; }
+        public override bool Changed { get; protected set; }    // TODO need to test Changed!
 
         /// <summary>
         /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.

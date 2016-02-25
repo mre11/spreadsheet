@@ -526,6 +526,21 @@ namespace SS
         }
 
         /// <summary>
+        /// Test setting and getting FormulaError.Reason
+        /// </summary>
+        [TestMethod]
+        public void TestFormulaError1()
+        {
+            var ss = new Spreadsheet();
+
+            ss.SetContentsOfCell("A1", "=B1+3");
+
+            FormulaError error = (FormulaError) ss.GetCellValue("A1");
+
+            Assert.AreEqual("Cell reference not found", error.Reason);
+        }
+
+        /// <summary>
         /// Returns the upper-case version of s
         /// </summary>
         public string UpperCaseNormalizer(string s)
