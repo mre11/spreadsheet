@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Collections.Generic;
+using Formulas;
 
 namespace SS
 {
@@ -356,14 +358,18 @@ namespace SS
         }
 
         /// <summary>
-        /// TODO Test that exception is thrown if problem occurs while writing file?
+        /// Test that exception is thrown if problem occurs while writing file
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(IOException))]
         public void TestSave4()
         {
             var ss = new Spreadsheet();
-            //ss.Save(outputWriter);
+            var baseFileName = "save4";
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".xml");
+            outputWriter.Close();
+
+            ss.Save(outputWriter); // output writer is already being used when we try to save to it
         }
 
         /// <summary>
@@ -381,8 +387,7 @@ namespace SS
 
             Assert.AreEqual(baseline, output);
         }
-
-        // TODO write tests for Spreadsheet TextReader constructor
+        
         /// <summary>
         /// Read in an empty spreadsheet with default IsValid.
         /// </summary>
@@ -391,7 +396,133 @@ namespace SS
         {
             var baseFileName = "read1";
             var ss = new Spreadsheet(new StreamReader(DATA_FOLDER + baseFileName + ".xml"));
-                       
+
+            Assert.IsFalse(ss.GetNamesOfAllNonemptyCells().GetEnumerator().MoveNext());                                  
+        }
+
+        /// <summary>
+        /// Read in an empty spreadsheet with given IsValid.
+        /// </summary>
+        [TestMethod]
+        public void TestRead2()
+        {
+            var baseFileName = "read2";
+            var ss = new Spreadsheet(new StreamReader(DATA_FOLDER + baseFileName + ".xml"));
+
+            Assert.IsFalse(ss.GetNamesOfAllNonemptyCells().GetEnumerator().MoveNext());
+        }
+
+        /// <summary>
+        /// Read in a non-empty spreadsheet.
+        /// </summary>
+        [TestMethod]
+        public void TestRead3()
+        {
+            var baseFileName = "read3";
+            var ss = new Spreadsheet(new StreamReader(DATA_FOLDER + baseFileName + ".xml"));
+
+            List<string> cellList = ss.GetNamesOfAllNonemptyCells().ToList();
+
+            Assert.AreEqual(4, cellList.Count);
+            Assert.IsTrue(cellList.Contains("A1"));
+            Assert.IsTrue(cellList.Contains("B22"));
+            Assert.IsTrue(cellList.Contains("C100001"));
+            Assert.IsTrue(cellList.Contains("D555"));
+
+            Assert.AreEqual("hello", ss.GetCellContents("A1"));
+            Assert.AreEqual("hello", ss.GetCellValue("A1"));
+
+            Assert.AreEqual(2.54, ss.GetCellContents("B22"));
+            Assert.AreEqual(2.54, ss.GetCellValue("B22"));
+
+            Assert.AreEqual(new Formula("A1").ToString(), ss.GetCellContents("C100001").ToString());
+            Assert.AreEqual(typeof(FormulaError), ss.GetCellValue("C100001").GetType());
+
+            Assert.AreEqual(new Formula("B22*10").ToString(), ss.GetCellContents("D555").ToString());
+            Assert.AreEqual(25.4, ss.GetCellValue("D555"));
+
+            ss.SetContentsOfCell("A1", "55");
+            ss.SetContentsOfCell("A2", "=11");
+        }
+
+        /// <summary>
+        /// Problem reading source
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(IOException))]
+        public void TestRead4()
+        {
+            var baseFileName = "read1";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            inputReader.ReadToEnd();
+
+            var ss = new Spreadsheet(inputReader); // inputReader is already in use
+        }
+
+        /// <summary>
+        /// Source inconsistent with schema
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRead5()
+        {
+            var baseFileName = "read5";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            var ss = new Spreadsheet(inputReader);
+        }
+
+        /// <summary>
+        /// Invalid cell name
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRead6()
+        {
+            var baseFileName = "read6";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            var ss = new Spreadsheet(inputReader);
+        }
+
+        /// <summary>
+        /// Duplicate cell name
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRead7()
+        {
+            var baseFileName = "read7";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            var ss = new Spreadsheet(inputReader);
+        }
+
+        /// <summary>
+        /// Invalid formula
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRead8()
+        {
+            var baseFileName = "read8";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            var ss = new Spreadsheet(inputReader);
+        }
+
+        /// <summary>
+        /// Circular reference
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRead9()
+        {
+            var baseFileName = "read9";
+            var inputReader = new StreamReader(DATA_FOLDER + baseFileName + ".xml");
+
+            var ss = new Spreadsheet(inputReader);
         }
 
         /// <summary>

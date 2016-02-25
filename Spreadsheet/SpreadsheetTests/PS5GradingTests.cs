@@ -335,21 +335,6 @@ namespace GradingTests
             ISet<String> cells = s.SetContentsOfCell("E1", "0");
             AssertSetEqualsIgnoreCase(new HashSet<string>() { "A1", "B1", "B2", "C1", "C2", "C3", "C4", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "E1" }, cells);
         }
-        [TestMethod()]
-        public void Test32()
-        {
-            Test31();
-        }
-        [TestMethod()]
-        public void Test33()
-        {
-            Test31();
-        }
-        [TestMethod()]
-        public void Test34()
-        {
-            Test31();
-        }
 
         [TestMethod()]
         public void Test35()
@@ -362,21 +347,7 @@ namespace GradingTests
                 AssertSetEqualsIgnoreCase(cells, s.SetContentsOfCell("A" + i, "=A" + (i + 1)));
             }
         }
-        [TestMethod()]
-        public void Test36()
-        {
-            Test35();
-        }
-        [TestMethod()]
-        public void Test37()
-        {
-            Test35();
-        }
-        [TestMethod()]
-        public void Test38()
-        {
-            Test35();
-        }
+        
         [TestMethod()]
         public void Test39()
         {
@@ -393,21 +364,6 @@ namespace GradingTests
             catch (CircularException)
             {
             }
-        }
-        [TestMethod()]
-        public void Test40()
-        {
-            Test39();
-        }
-        [TestMethod()]
-        public void Test41()
-        {
-            Test39();
-        }
-        [TestMethod()]
-        public void Test42()
-        {
-            Test39();
         }
 
         [TestMethod()]
@@ -434,22 +390,6 @@ namespace GradingTests
             }
 
 
-        }
-
-        [TestMethod()]
-        public void Test44()
-        {
-            Test43();
-        }
-        [TestMethod()]
-        public void Test45()
-        {
-            Test43();
-        }
-        [TestMethod()]
-        public void Test46()
-        {
-            Test43();
         }
 
         [TestMethod()]

@@ -6,6 +6,7 @@ using Dependencies;
 using System.Linq;
 using System.IO;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace SS
 {
@@ -44,6 +45,9 @@ namespace SS
         /// </summary>
         private DependencyGraph dg;
 
+        /// <summary>
+        /// Used to validate cell names
+        /// </summary>
         private Regex IsValid { get; set; }
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace SS
         {
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
-            IsValid = new Regex(@".*");
+            IsValid = new Regex(@"^.*$");
             Changed = false;
         }
 
@@ -85,25 +89,81 @@ namespace SS
         /// </summary>
         public Spreadsheet(TextReader source)
             : this()
-        {          
-            // TODO complete implementation of Spreadsheet TextReader constructor  
-            using (var reader = XmlReader.Create(source))
+        {
+            // Use a schema to validate the source file
+            XmlSchemaSet schema = new XmlSchemaSet();
+            schema.Add(null, "Spreadsheet.xsd");
+
+            // Configure validation
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.ValidationType = ValidationType.Schema;
+            settings.Schemas = schema;
+            settings.ValidationEventHandler += XmlValidationError;
+
+            try
             {
-                while (reader.Read())
+                using (var reader = XmlReader.Create(source, settings))
                 {
-                    if (reader.IsStartElement())
+                    while (reader.Read())
                     {
-                        switch (reader.Name)
+                        if (reader.IsStartElement())
                         {
-                            case "spreadsheet":
-                                IsValid = new Regex(reader["IsValid"]);
-                                break;
-                            case "cell":
-                                SetContentsOfCell(reader["name"], reader["contents"]);
-                                break;
+                            switch (reader.Name)
+                            {
+                                case "spreadsheet":
+                                    IsValid = new Regex(reader["IsValid"]);
+                                    break;
+                                case "cell":                                    
+                                    TrySetContentsOfCell(reader["name"], reader["contents"]);
+                                    break;
+                            }
                         }
                     }
                 }
+            }
+            catch (XmlException)
+            {
+                throw new IOException("Error reading file");
+            }
+        }
+
+        /// <summary>
+        /// Throws a SpreadsheetReadException if the .xml is not valid
+        /// </summary>
+        private void XmlValidationError(object sender, ValidationEventArgs e)
+        {
+            throw new SpreadsheetReadException("Invalid file format: " + e.Message);
+        }
+
+        /// <summary>
+        /// If the cell name is invalid or already exists in this spreadsheet,
+        /// throws a SpreadsheetReadException.
+        /// If the contents is a formula which is invalid or creates a circular
+        /// dependence, throws a SpreadsheetReadException.
+        /// Otherwise, sets the contents of the named cell to contents.
+        /// </summary>
+        private void TrySetContentsOfCell(string name, string contents)
+        {
+            if (GetNamesOfAllNonemptyCells().Contains(name))
+            {
+                throw new SpreadsheetReadException("Duplicate cell name in file");
+            }
+
+            try
+            {              
+                SetContentsOfCell(name, contents);
+            }
+            catch(CircularException)
+            {
+                throw new SpreadsheetReadException("Circular reference in file");
+            }
+            catch(FormulaFormatException)
+            {
+                throw new SpreadsheetReadException("Invalid formula in file");
+            }
+            catch(InvalidNameException)
+            {
+                throw new SpreadsheetReadException("Invalid cell name in file");
             }
         }
 
