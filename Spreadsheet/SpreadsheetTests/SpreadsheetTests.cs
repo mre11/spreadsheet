@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Implemented by Morgan Empey for CS 3500, University of Utah, Spring 2015
+
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -538,6 +540,28 @@ namespace SS
             FormulaError error = (FormulaError) ss.GetCellValue("A1");
 
             Assert.AreEqual("Cell reference not found", error.Reason);
+        }
+
+        /// <summary>
+        /// Test the Changed property
+        /// </summary>
+        [TestMethod]
+        public void TestChanged1()
+        {
+            var ss = new Spreadsheet();
+
+            Assert.IsFalse(ss.Changed);            
+
+            ss.SetContentsOfCell("A1", "3");
+
+            Assert.IsTrue(ss.Changed);
+
+            var baseFileName = "changed1";
+            var outputWriter = new StreamWriter(OUTPUT_FOLDER + baseFileName + ".xml");
+
+            ss.Save(outputWriter);
+
+            Assert.IsFalse(ss.Changed);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Implemented by Morgan Empey for CS 3500, University of Utah, Spring 2015
+
+using System;
 using System.Collections.Generic;
 using Formulas;
 using System.Text.RegularExpressions;
@@ -54,7 +56,7 @@ namespace SS
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
         /// </summary>
-        public override bool Changed { get; protected set; }    // TODO need to test Changed!
+        public override bool Changed { get; protected set; }
 
         /// <summary>
         /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.
@@ -172,6 +174,7 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
+            // Only non-empty Cells are stored in cells
             foreach (KeyValuePair<string, Cell> kvp in cells)
             {
                 yield return kvp.Key;
@@ -269,7 +272,7 @@ namespace SS
             Cell c;
             if (cells.TryGetValue(normalizedName, out c))
             {
-                if (contents.GetType() == typeof(string) && (string)contents == "")
+                if (contents.GetType() == typeof(string) && (string) contents == "")
                 {
                     cells.Remove(normalizedName); // empty string means empty cell; just remove it.
                 }
@@ -280,7 +283,7 @@ namespace SS
             }
             else
             {
-                if (contents.GetType() != typeof(string) || (string)contents != "") // don't add an empty cell
+                if (contents.GetType() != typeof(string) || (string) contents != "") // don't add an empty cell
                 {
                     cells.Add(normalizedName, new Cell(normalizedName, contents));
                 }
@@ -344,7 +347,7 @@ namespace SS
                     {
                         try
                         {
-                            c.Value = ((Formula)c.Contents).Evaluate(CellValueLookup);
+                            c.Value = ((Formula) c.Contents).Evaluate(CellValueLookup);
                         }
                         catch(Exception e)
                         {
