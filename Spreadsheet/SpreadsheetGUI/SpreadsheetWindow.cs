@@ -1,62 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SSGUI
+namespace SSGui
 {
     public partial class SpreadsheetWindow : Form, ISpreadsheetView
     {
         public string WindowName
         {
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { this.Text = value; }
         }
 
         public string SelectedCellName
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return nameBox.Text; }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { nameBox.Text = value; }
         }
 
         public string SelectedCellValue
         {
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { valueBox.Text = value; }
         }
 
         public string SelectedCellContents
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return contentsBox.Text; }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { this.contentsBox.Text = value; }
         }
 
         public SpreadsheetWindow()
         {
             InitializeComponent();
+
+            spreadsheetPanel.SelectionChanged += CellSelectionHandler;
+        }
+
+        private void CellSelectionHandler(SpreadsheetPanel ssPanel)
+        {
+            int col, row;
+            ssPanel.GetSelection(out col, out row);
+
+            if (CellSelectionChangedEvent != null)
+            {
+                CellSelectionChangedEvent(col, row);
+            }
         }
 
         public event Action NewFileEvent;
@@ -64,42 +52,74 @@ namespace SSGUI
         public event Action<string> SaveFileEvent;
         public event Action CloseEvent;
         public event Action HelpContentsEvent;
-        public event Action<string> SetContentsEvent;
-        public event Action<string> CellSelectionChangedEvent;
-
-        private void formulaBox_TextChanged(object sender, EventArgs e)
-        {
-            // TODO if 'Enter' is hit, do something
-        }
+        public event Action<int, int> SetContentsEvent;
+        public event Action<int, int> CellSelectionChangedEvent;
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (NewFileEvent != null)
+            {
+                NewFileEvent();
+            }
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            DialogResult result = openFileDialog.ShowDialog();
+            if (result == DialogResult.Yes || result == DialogResult.OK)
+            {
+                if (FileChosenEvent != null)
+                {
+                    FileChosenEvent(openFileDialog.FileName);
+                }
+            }
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            DialogResult result = saveAsFileDialog.ShowDialog();
+            if (result == DialogResult.Yes || result == DialogResult.OK)
+            {
+                if (SaveFileEvent != null)
+                {
+                    SaveFileEvent(saveAsFileDialog.FileName);
+                }
+            }
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (CloseEvent != null)
+            {
+                CloseEvent();
+            }
         }
 
         private void contentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (HelpContentsEvent != null)
+            {
+                HelpContentsEvent();
+            }
         }
 
         public void SetCellValue(int col, int row, string value)
         {
-            throw new NotImplementedException();
+            spreadsheetPanel.SetValue(col, row, value);
+        }
+
+        private void contentsBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Return) // ENTER key is pressed
+            {
+                int col, row;
+                spreadsheetPanel.GetSelection(out col, out row);
+
+                if (SetContentsEvent != null)
+                {
+                    SetContentsEvent(col, row);
+                }
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using SSGUI;
+﻿using SSGui;
 using System;
 using System.Windows.Forms;
 

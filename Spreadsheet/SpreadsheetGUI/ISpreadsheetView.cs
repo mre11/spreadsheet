@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SSGUI
+namespace SSGui
 {
     // Provides a controllable interface for the SpreadsheetWindow
     public interface ISpreadsheetView
@@ -15,9 +15,9 @@ namespace SSGUI
 
         event Action HelpContentsEvent;
 
-        event Action<string> SetContentsEvent;
+        event Action<int, int> SetContentsEvent;
 
-        event Action<string> CellSelectionChangedEvent;
+        event Action<int, int> CellSelectionChangedEvent;
 
         void SetCellValue(int col, int row, string value);
 
