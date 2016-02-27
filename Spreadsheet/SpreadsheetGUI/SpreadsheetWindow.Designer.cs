@@ -1,4 +1,4 @@
-﻿namespace SpreadsheetGUI
+﻿namespace SSGUI
 {
     partial class SpreadsheetWindow
     {
@@ -124,8 +124,8 @@
             // 
             // container
             // 
-            this.container.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.container.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.container.Controls.Add(this.spreadsheetPanel);
             this.container.Location = new System.Drawing.Point(0, 50);

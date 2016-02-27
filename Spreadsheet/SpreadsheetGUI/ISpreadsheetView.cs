@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpreadsheetGUI
+namespace SSGUI
 {
     // Provides a controllable interface for the SpreadsheetWindow
     public interface ISpreadsheetView

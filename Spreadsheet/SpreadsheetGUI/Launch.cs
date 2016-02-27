@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using SSGUI;
+using System;
 using System.Windows.Forms;
 
-namespace SpreadsheetGUI
+namespace SS
 {
     static class Launch
     {
