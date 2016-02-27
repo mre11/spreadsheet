@@ -17,7 +17,7 @@ namespace SS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SpreadsheetDemo());
+            Application.Run(new SSGui.SpreadsheetDemo());
         }
     }
 }
