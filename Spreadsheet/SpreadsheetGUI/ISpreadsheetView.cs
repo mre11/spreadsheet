@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
+
+using System;
 
 namespace SSGui
 {
