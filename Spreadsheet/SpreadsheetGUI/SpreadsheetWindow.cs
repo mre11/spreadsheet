@@ -16,5 +16,10 @@ namespace SpreadsheetGUI
         {
             InitializeComponent();
         }
+
+        private void formulaBox_TextChanged(object sender, EventArgs e)
+        {
+            // TODO if 'Enter' is hit, do something
+        }
     }
 }
