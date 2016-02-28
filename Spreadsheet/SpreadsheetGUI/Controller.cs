@@ -78,17 +78,19 @@ namespace SSGui
         }
 
         /// <summary>
-        /// Handles the event of setting the contents of a cell
+        /// Handles the event of setting the contents of a cell.
+        /// Parameters are the column and row of the cell.
         /// </summary>
-        private void HandleSetContentsEvent()
+        private void HandleSetContentsEvent(int col, int row)
         {
 
         }
 
         /// <summary>
-        /// Handles the event of changing the selected cell
+        /// Handles the event of changing the selected cell.
+        /// Parameters are the column and row of the newly-selected cell.
         /// </summary>
-        private void HandleSelectionChangedEvent()
+        private void HandleSelectionChangedEvent(int col, int row)
         {
 
         }

@@ -1,8 +1,13 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
-namespace SSGui
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SSGui;
+
+namespace SSControllerTester
 {
+    /// <summary>
+    /// Provides test cases for the Controller class
+    /// </summary>
     [TestClass]
     public class ControllerTests
     {
@@ -10,66 +15,10 @@ namespace SSGui
         public void TestMethod1()
         {
         }
-    }
 
-    /// <summary>
-    /// Provides a stub view to test the controller against.
-    /// </summary>
-    class SSView : ISpreadsheetView
-    {
-        public string SelectedCellContents
+        private Controller InitializeTest()
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
+            return new Controller( new SSView());
         }
-
-        public string SelectedCellName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string SelectedCellValue
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string WindowName
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public event Action<int, int> CellSelectionChangedEvent;
-        public event Action CloseEvent;
-        public event Action<string> FileChosenEvent;
-        public event Action HelpContentsEvent;
-        public event Action NewFileEvent;
-        public event Action<string> SaveFileEvent;
-        public event Action<int, int> SetContentsEvent;
-
-        public void SetCellValue(int col, int row, string value)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    }    
 }
