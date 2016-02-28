@@ -14,7 +14,11 @@ namespace SS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SpreadsheetWindow());
+
+            // Run a single context that supports multiple windows
+            var appContext = SpreadsheetApplicationContext.GetContext();
+            appContext.RunNew();
+            Application.Run(appContext);
         }
     }
 }
