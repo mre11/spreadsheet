@@ -11,14 +11,18 @@ namespace SSControllerTester
     [TestClass]
     public class ControllerTests
     {
+        /// <summary>
+        /// Tests the new event
+        /// </summary>
         [TestMethod]
-        public void TestMethod1()
+        public void TestNew1()
         {
-        }
+            var view = new SSView();
+            var controller = new Controller(view);
 
-        private Controller InitializeTest()
-        {
-            return new Controller( new SSView());
+            view.FireNewFileEvent();
+
+            Assert.IsTrue(view.CalledDoNew);
         }
     }    
 }

@@ -7,6 +7,14 @@ namespace SSGui
     // Provides a controllable interface for the SpreadsheetWindow
     public interface ISpreadsheetView
     {
+        string WindowName { set; }
+
+        string SelectedCellName { get; set; }
+
+        string SelectedCellValue { set; }
+
+        string SelectedCellContents { get; set; }
+
         event Action NewFileEvent;
 
         event Action<string> FileChosenEvent;
@@ -23,12 +31,10 @@ namespace SSGui
 
         void SetCellValue(int col, int row, string value);
 
-        string WindowName { set; }
+        void DoNew();
 
-        string SelectedCellName { get; set; }
+        void DoClose();
 
-        string SelectedCellValue { set; }
-
-        string SelectedCellContents { get; set; }
+        void DoHelpContents();
     }
 }

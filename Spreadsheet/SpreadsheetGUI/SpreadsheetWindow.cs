@@ -165,5 +165,29 @@ namespace SSGui
                 }
             }
         }
+
+        /// <summary>
+        /// Opens a new spreadsheet window
+        /// </summary>
+        public void DoNew()
+        {
+            SpreadsheetApplicationContext.GetContext().RunNew();
+        }
+
+        /// <summary>
+        /// Closes this window
+        /// </summary>
+        public void DoClose()
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// Displays the help contents
+        /// </summary>
+        public void DoHelpContents()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

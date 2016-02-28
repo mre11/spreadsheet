@@ -46,7 +46,7 @@ namespace SSGui
         {
             var window = new SpreadsheetWindow();
 
-            // TODO new Controller(window);
+            new Controller(window);
 
             windowCount++;
 
