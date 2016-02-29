@@ -7,7 +7,7 @@ namespace SSGui
     // Provides a controllable interface for the SpreadsheetWindow
     public interface ISpreadsheetView
     {
-        string WindowName { set; }
+        string Title { set; }
 
         string SelectedCellName { get; set; }
 

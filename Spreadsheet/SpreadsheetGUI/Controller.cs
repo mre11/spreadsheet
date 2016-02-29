@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using SS;
 
 namespace SSGui
@@ -34,7 +35,16 @@ namespace SSGui
         /// </summary>
         public Controller(ISpreadsheetView window)
         {
-            
+            model = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
+            view = window;
+
+            view.NewFileEvent += HandleNewEvent;
+            view.FileChosenEvent += HandleOpenEvent;
+            view.SaveFileEvent += HandleSaveEvent;
+            view.CloseEvent += HandleCloseEvent;
+            view.HelpContentsEvent += HandleHelpContentsEvent;
+            view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
+            view.SetContentsEvent += HandleSetContentsEvent;
         }
 
         /// <summary>

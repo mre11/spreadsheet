@@ -13,7 +13,7 @@ namespace SSGui
         /// <summary>
         /// The name in the title bar of the spreadsheet window
         /// </summary>
-        public string WindowName
+        public string Title
         {
             set { this.Text = value; }
         }

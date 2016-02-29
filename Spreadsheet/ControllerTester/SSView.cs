@@ -19,7 +19,7 @@ namespace SSControllerTester
         /// <summary>
         /// The name of the view
         /// </summary>
-        public string WindowName { get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// The displayed name of the currently selected cell
