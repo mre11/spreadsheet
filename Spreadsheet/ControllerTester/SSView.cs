@@ -69,6 +69,10 @@ namespace SSControllerTester
                     displayedValues[i, j] = "";
                 }
             }
+
+            SelectedCellName = "A1";
+            SelectedCellContents = "";
+            SelectedCellValue = "";
         }
 
         public event Action NewFileEvent;

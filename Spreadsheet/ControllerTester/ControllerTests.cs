@@ -12,7 +12,7 @@ namespace SSControllerTester
     public class ControllerTests
     {
         // Folder containing XML test data for reading
-        private const string DATA_FOLDER = @"..\..\..\TestData\XML\Data\";
+        private const string DATA_FOLDER = @"..\..\..\..\TestData\XML\Data\";
 
         /// <summary>
         /// Tests the new event
@@ -116,7 +116,7 @@ namespace SSControllerTester
 
             Assert.AreEqual("C99", view.SelectedCellName);
             Assert.AreEqual("2.54", view.SelectedCellValue);
-            Assert.AreEqual("=b22", view.SelectedCellContents);
+            Assert.AreEqual("=B22", view.SelectedCellContents);
 
             view.FireCellSelectionChangedEvent(3, 4);
 
@@ -149,6 +149,7 @@ namespace SSControllerTester
             view.SelectedCellContents = "hello";
             view.FireSetContentsEvent(0, 0);
 
+            // TODO figure out how to set boxes when first new or opened
             Assert.AreEqual("hello", view.SelectedCellValue);
             Assert.AreEqual("hello", view.GetCellValue(0, 0));
         }
