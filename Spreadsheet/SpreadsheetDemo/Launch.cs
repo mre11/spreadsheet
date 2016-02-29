@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using SSGui;
 
 
-namespace SS
+namespace SSGui
 {
     /// <summary>
     /// Runs a demo involving a SpreadsheetPanel
