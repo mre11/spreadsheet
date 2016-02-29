@@ -478,8 +478,10 @@ namespace SS
                 throw new InvalidNameException();
             }
 
+            var normalizedName = name.ToUpper();
+
             Cell c;
-            if (cells.TryGetValue(name, out c))
+            if (cells.TryGetValue(normalizedName, out c))
             {
                 return c.Value;
             }
