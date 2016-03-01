@@ -138,7 +138,7 @@ namespace SSGui
             {
                 cellsToUpdate = model.SetContentsOfCell(cellName, view.SelectedCellContents);
             }
-            catch
+            catch (Exception e)
             {
                 // TODO catch stuff in set contents event
             }

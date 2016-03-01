@@ -156,13 +156,23 @@ namespace SSGui
         {
             if (e.KeyChar == (char)Keys.Return) // ENTER key is pressed
             {
-                int col, row;
-                spreadsheetPanel.GetSelection(out col, out row);
+                FireSetContentsEvent();
+            }
+        }
 
-                if (SetContentsEvent != null)
-                {
-                    SetContentsEvent(col, row);
-                }
+        private void setButton_Click(object sender, EventArgs e)
+        {
+            FireSetContentsEvent();
+        }
+
+        private void FireSetContentsEvent()
+        {
+            int col, row;
+            spreadsheetPanel.GetSelection(out col, out row);
+
+            if (SetContentsEvent != null)
+            {
+                SetContentsEvent(col, row);
             }
         }
 
