@@ -15,6 +15,8 @@ namespace SSGui
 
         string SelectedCellContents { get; set; }
 
+        string DefaultOpenSaveFileName { set; }
+
         event Action NewFileEvent;
 
         event Action<string> FileChosenEvent;

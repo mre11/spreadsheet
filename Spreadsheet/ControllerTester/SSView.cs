@@ -57,6 +57,11 @@ namespace SSControllerTester
         public bool CalledShowErrorMessage { get; private set; }
 
         /// <summary>
+        /// Default file name that would be shown in open or save as file dialogs
+        /// </summary>
+        public string DefaultOpenSaveFileName { get; set; }
+
+        /// <summary>
         /// Creates an empty SSView
         /// </summary>
         internal SSView()

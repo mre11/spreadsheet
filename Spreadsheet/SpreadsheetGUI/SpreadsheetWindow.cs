@@ -47,6 +47,18 @@ namespace SSGui
         }
 
         /// <summary>
+        /// The default file name when the open or save as dialogs are shown.
+        /// </summary>
+        public string DefaultOpenSaveFileName
+        {
+            set
+            {
+                openFileDialog.FileName = value;
+                saveAsFileDialog.FileName = value;
+            }
+        }
+
+        /// <summary>
         /// Creates a new spreadsheet window
         /// </summary>
         public SpreadsheetWindow()
@@ -69,6 +81,8 @@ namespace SSGui
                 CellSelectionChangedEvent(col, row);
             }
         }
+
+        private Form helpWindow = new Help();
 
         public event Action NewFileEvent;
         public event Action<string> FileChosenEvent;
@@ -199,8 +213,8 @@ namespace SSGui
         /// </summary>
         public void DoHelpContents()
         {
-            // TODO implement help
-            throw new NotImplementedException();
+            helpWindow.Show();
+            // TODO write help contents            
         }
 
         /// <summary>

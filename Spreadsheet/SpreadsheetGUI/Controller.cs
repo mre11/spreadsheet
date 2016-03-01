@@ -50,6 +50,7 @@ namespace SSGui
             // Initialize view
             UpdateSelectedCellView("A1");
             SetTitle();
+            view.DefaultOpenSaveFileName = Path.GetFileName(FileName);
         }
 
         /// <summary>
@@ -64,7 +65,13 @@ namespace SSGui
         /// Handles an open file event
         /// </summary>
         private void HandleOpenEvent(string path)
-        {
+        {            
+            if (model.Changed)
+            {
+                // TODO do open check better
+                view.ShowErrorMessage("Save changes to current file before opening a new one", "Error");
+            }
+
             try
             {
                 model = new Spreadsheet(new StreamReader(path));
@@ -104,10 +111,17 @@ namespace SSGui
         /// </summary>
         private void HandleSaveEvent(string path)
         {
-            // TODO handle save event (incomplete, need logic and stuff)
-            model.Save(new StreamWriter(path));
+            if (model.Changed || PathIsDifferent(path))
+            {
+                model.Save(new StreamWriter(path));
+                FileName = Path.GetFileName(path);
+                view.DefaultOpenSaveFileName = FileName;
+            }            
+        }
 
-            FileName = Path.GetFileName(path);
+        private bool PathIsDifferent(string path)
+        {
+            return path != Path.GetDirectoryName(path) + "\\" + FileName;
         }
 
         /// <summary>
