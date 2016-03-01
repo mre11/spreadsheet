@@ -150,7 +150,7 @@ namespace SSControllerTester
             view.FireSetContentsEvent(0, 0);
   
             Assert.AreEqual("hello", view.SelectedCellValue);
-            Assert.AreEqual("hello", view.GetCellValue(0, 0));            
+            Assert.AreEqual("hello", view.GetCellValue(0, 0));
         }
 
         /// <summary>

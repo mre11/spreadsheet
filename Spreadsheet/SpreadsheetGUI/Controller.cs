@@ -46,9 +46,9 @@ namespace SSGui
             view.HelpContentsEvent += HandleHelpContentsEvent;
             view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
             view.SetContentsEvent += HandleSetContentsEvent;
-            
+
             // Initialize view
-            HandleSelectionChangedEvent(0, 0);
+            UpdateSelectedCellView("A1");
             SetTitle();
         }
 
@@ -145,7 +145,7 @@ namespace SSGui
 
             // Update any cell values in the view that need updating
             UpdateCellValuesInView(cellsToUpdate);
-            HandleSelectionChangedEvent(col, row);
+            UpdateSelectedCellView(cellName);
         }
 
         /// <summary>
@@ -181,11 +181,9 @@ namespace SSGui
         /// </summary>
         private void HandleSelectionChangedEvent(int col, int row)
         {
-            var cellName = GetCellNameFromIndices(col, row);
+            var cellName = GetCellNameFromIndices(col, row);            
 
-            view.SelectedCellName = cellName;
-            view.SelectedCellValue = model.GetCellValue(cellName).ToString();
-            SetSelectedCellContents(cellName);            
+            UpdateSelectedCellView(cellName);
         }
 
         /// <summary>
@@ -218,6 +216,16 @@ namespace SSGui
             }
 
             view.SelectedCellContents = stringCellContents;
+        }
+
+        /// <summary>
+        /// Updates the selected cell name, value, and contents in the view from the model.
+        /// </summary>
+        private void UpdateSelectedCellView(string cellName)
+        {
+            view.SelectedCellName = cellName;
+            view.SelectedCellValue = model.GetCellValue(cellName).ToString();
+            SetSelectedCellContents(cellName);
         }
     }
 }
