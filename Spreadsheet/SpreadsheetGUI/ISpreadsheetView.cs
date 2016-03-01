@@ -36,5 +36,7 @@ namespace SSGui
         void DoClose();
 
         void DoHelpContents();
+
+        void ShowErrorMessage(string message, string title);
     }
 }

@@ -52,6 +52,11 @@ namespace SSControllerTester
         public bool CalledHelpContents { get; private set; }
 
         /// <summary>
+        /// Records if an error message was shown.
+        /// </summary>
+        public bool CalledShowErrorMessage { get; private set; }
+
+        /// <summary>
         /// Creates an empty SSView
         /// </summary>
         internal SSView()
@@ -189,6 +194,11 @@ namespace SSControllerTester
         public void DoHelpContents()
         {
             CalledHelpContents = true;
+        }
+
+        public void ShowErrorMessage(string message, string title)
+        {
+            CalledShowErrorMessage = true;
         }
     }
 }

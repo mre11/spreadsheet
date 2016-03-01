@@ -155,14 +155,15 @@
             this.valueBox.Location = new System.Drawing.Point(143, 24);
             this.valueBox.Name = "valueBox";
             this.valueBox.ReadOnly = true;
-            this.valueBox.Size = new System.Drawing.Size(133, 20);
+            this.valueBox.Size = new System.Drawing.Size(186, 20);
             this.valueBox.TabIndex = 4;
             this.valueBox.TabStop = false;
             this.toolTip.SetToolTip(this.valueBox, "Value");
             // 
             // contentsBox
             // 
-            this.contentsBox.Location = new System.Drawing.Point(335, 24);
+            this.contentsBox.AcceptsReturn = true;
+            this.contentsBox.Location = new System.Drawing.Point(388, 24);
             this.contentsBox.Name = "contentsBox";
             this.contentsBox.Size = new System.Drawing.Size(506, 20);
             this.contentsBox.TabIndex = 0;
@@ -187,7 +188,7 @@
             // 
             // setButton
             // 
-            this.setButton.Location = new System.Drawing.Point(847, 22);
+            this.setButton.Location = new System.Drawing.Point(900, 22);
             this.setButton.Name = "setButton";
             this.setButton.Size = new System.Drawing.Size(75, 23);
             this.setButton.TabIndex = 1;
@@ -216,7 +217,7 @@
             // selectedCellContentsLabel
             // 
             this.selectedCellContentsLabel.AutoSize = true;
-            this.selectedCellContentsLabel.Location = new System.Drawing.Point(282, 27);
+            this.selectedCellContentsLabel.Location = new System.Drawing.Point(335, 27);
             this.selectedCellContentsLabel.Name = "selectedCellContentsLabel";
             this.selectedCellContentsLabel.Size = new System.Drawing.Size(47, 13);
             this.selectedCellContentsLabel.TabIndex = 9;

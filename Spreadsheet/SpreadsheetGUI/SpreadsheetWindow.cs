@@ -157,6 +157,8 @@ namespace SSGui
             if (e.KeyChar == (char)Keys.Return) // ENTER key is pressed
             {
                 FireSetContentsEvent();
+                
+                e.Handled = true;
             }
         }
 
@@ -197,7 +199,16 @@ namespace SSGui
         /// </summary>
         public void DoHelpContents()
         {
+            // TODO implement help
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Shows an error message
+        /// </summary>
+        public void ShowErrorMessage(string message, string title)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

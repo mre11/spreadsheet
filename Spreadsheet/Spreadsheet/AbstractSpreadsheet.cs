@@ -68,6 +68,14 @@ namespace SS
         ///  The reason why this FormulaError was created.
         /// </summary>
         public string Reason { get; private set; }
+
+        /// <summary>
+        /// Returns the Reason formatted as an error.
+        /// </summary>
+        public override string ToString()
+        {
+            return "ERR: " + Reason;
+        }
     }
 
 

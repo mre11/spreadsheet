@@ -71,7 +71,8 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                // TODO add access to message box in view interface to use for error messages
+                // TODO better error message?
+                view.ShowErrorMessage(e.Message, "Error");
             }
 
             foreach(string cellName in model.GetNamesOfAllNonemptyCells())
@@ -140,7 +141,8 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                // TODO catch stuff in set contents event
+                // TODO better error message?
+                view.ShowErrorMessage(e.Message, "Error");
             }
 
             // Update any cell values in the view that need updating
@@ -170,7 +172,6 @@ namespace SSGui
                 GetCellIndicesFromName(name, out col, out row);
 
                 string cellValue = model.GetCellValue(name).ToString();
-
                 view.SetCellValue(col, row, cellValue);
             }
         }
