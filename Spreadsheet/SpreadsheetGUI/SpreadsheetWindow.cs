@@ -176,11 +176,17 @@ namespace SSGui
             }
         }
 
+        /// <summary>
+        /// Event handler for set button being clicked
+        /// </summary>
         private void setButton_Click(object sender, EventArgs e)
         {
             FireSetContentsEvent();
         }
 
+        /// <summary>
+        /// Fires the set contents event for the selected cell
+        /// </summary>
         private void FireSetContentsEvent()
         {
             int col, row;
@@ -214,7 +220,7 @@ namespace SSGui
         public void DoHelpContents()
         {
             helpWindow.Show();
-            // TODO write help contents            
+            // TODO write help contents
         }
 
         /// <summary>

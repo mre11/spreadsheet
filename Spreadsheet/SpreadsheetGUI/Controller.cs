@@ -65,12 +65,8 @@ namespace SSGui
         /// Handles an open file event
         /// </summary>
         private void HandleOpenEvent(string path)
-        {            
-            if (model.Changed)
-            {
-                // TODO do open check better
-                view.ShowErrorMessage("Save changes to current file before opening a new one", "Error");
-            }
+        {
+            // TODO open should open in a new window :(
 
             try
             {
@@ -111,6 +107,7 @@ namespace SSGui
         /// </summary>
         private void HandleSaveEvent(string path)
         {
+            // TODO implement a Save in addition to save as?
             if (model.Changed || PathIsDifferent(path))
             {
                 model.Save(new StreamWriter(path));

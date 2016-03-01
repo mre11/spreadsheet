@@ -184,5 +184,7 @@ namespace SSControllerTester
             Assert.AreEqual("10", view.GetCellValue(0, 0));
             Assert.AreEqual("20", view.GetCellValue(2, 2));
         }
+
+        // TODO add tests to increase code coverage!
     }    
 }
