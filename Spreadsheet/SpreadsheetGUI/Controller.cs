@@ -46,8 +46,8 @@ namespace SSGui
             view.HelpContentsEvent += HandleHelpContentsEvent;
             view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
             view.SetContentsEvent += HandleSetContentsEvent;
-
-            // TODO initialize boxes here? 
+            
+            // Initialize view
             HandleSelectionChangedEvent(0, 0);
             SetTitle();
         }
@@ -65,14 +65,13 @@ namespace SSGui
         /// </summary>
         private void HandleOpenEvent(string path)
         {
-            // TODO handle open event (incomplete) also need try catch
             try
             {
                 model = new Spreadsheet(new StreamReader(path));
             }
             catch (Exception e)
             {
-                // TODO add access to message box in view interface
+                // TODO add access to message box in view interface to use for error messages
             }
 
             foreach(string cellName in model.GetNamesOfAllNonemptyCells())
@@ -146,6 +145,7 @@ namespace SSGui
 
             // Update any cell values in the view that need updating
             UpdateCellValuesInView(cellsToUpdate);
+            HandleSelectionChangedEvent(col, row);
         }
 
         /// <summary>
@@ -176,8 +176,8 @@ namespace SSGui
         }
 
         /// <summary>
-        /// Handles the event of changing the selected cell.
-        /// Parameters are the column and row of the newly-selected cell.
+        /// Sets the selected cell name, value, and contents in the view to
+        /// those values for the cell at col and row.
         /// </summary>
         private void HandleSelectionChangedEvent(int col, int row)
         {
