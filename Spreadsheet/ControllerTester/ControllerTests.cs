@@ -12,7 +12,7 @@ namespace SSControllerTester
     public class ControllerTests
     {
         // Folder containing XML test data for reading
-        private const string DATA_FOLDER = @"..\..\..\..\TestData\XML\Data\";
+        private const string DATA_FOLDER = @"..\..\..\TestData\XML\Data\";
 
         /// <summary>
         /// Tests the new event

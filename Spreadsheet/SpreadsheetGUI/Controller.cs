@@ -36,6 +36,7 @@ namespace SSGui
         {
             model = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             view = window;
+            FileName = "Spreadsheet1.ss";
 
             // Register event handlers
             view.NewFileEvent += HandleNewEvent;
@@ -45,8 +46,10 @@ namespace SSGui
             view.HelpContentsEvent += HandleHelpContentsEvent;
             view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
             view.SetContentsEvent += HandleSetContentsEvent;
-            
-            // TODO initialize boxes here?            
+
+            // TODO initialize boxes here? 
+            HandleSelectionChangedEvent(0, 0);
+            SetTitle();
         }
 
         /// <summary>
@@ -63,37 +66,48 @@ namespace SSGui
         private void HandleOpenEvent(string path)
         {
             // TODO handle open event (incomplete) also need try catch
-            model = new Spreadsheet(new StreamReader(path));
+            try
+            {
+                model = new Spreadsheet(new StreamReader(path));
+            }
+            catch (Exception e)
+            {
+                // TODO add access to message box in view interface
+            }
 
             foreach(string cellName in model.GetNamesOfAllNonemptyCells())
             {
                 int col, row;
                 GetCellIndicesFromName(cellName, out col, out row);
-                view.SetCellValue(col, row, model.GetCellValue(cellName).ToString());
-            }
 
+                string cellValue = model.GetCellValue(cellName).ToString();
+                view.SetCellValue(col, row, cellValue);
+            }
+            
             FileName = Path.GetFileName(path);
-            SetTitle(path);
+            SetTitle();
 
             // When the file is opened, set the name, value, and contents boxes
             HandleSelectionChangedEvent(0, 0);
         }
 
         /// <summary>
-        /// Sets the title of the window given a full file path
+        /// Sets the title of the window according to the FileName of this spreadsheet
         /// </summary>
-        private void SetTitle(string path)
+        private void SetTitle()
         {
-            view.Title = Path.GetFileName(path) + " - Spreadsheet";
+            view.Title = FileName + " - Spreadsheet";
         }
 
         /// <summary>
         /// Handles a save file event
         /// </summary>
-        private void HandleSaveEvent(string fileName)
+        private void HandleSaveEvent(string path)
         {
-            // TODO handle save event (incomplete, need logic)
-            model.Save(new StreamWriter(fileName));
+            // TODO handle save event (incomplete, need logic and stuff)
+            model.Save(new StreamWriter(path));
+
+            FileName = Path.GetFileName(path);
         }
 
         /// <summary>
@@ -131,22 +145,34 @@ namespace SSGui
             }
 
             // Update any cell values in the view that need updating
-            foreach (string name in cellsToUpdate)
-            {
-                int cellCol, cellRow;
-                GetCellIndicesFromName(name, out cellCol, out cellRow);
-
-                string cellValue = model.GetCellValue(name).ToString();
-
-                view.SetCellValue(cellCol, cellRow, cellValue);
-            }
+            UpdateCellValuesInView(cellsToUpdate);
         }
 
+        /// <summary>
+        /// Returns the row and column of a cell given its name.
+        /// </summary>
         private void GetCellIndicesFromName(string name, out int col, out int row)
         {
             col = name[0] - 65;
             int.TryParse(name.Substring(1), out row);
             row--;
+        }
+
+        /// <summary>
+        /// Updates the cell values in the view from the model. Only updates
+        /// cells specified in cellsToUpdate.
+        /// </summary>
+        private void UpdateCellValuesInView(ISet<string> cellsToUpdate)
+        {
+            foreach (string name in cellsToUpdate)
+            {
+                int col, row;
+                GetCellIndicesFromName(name, out col, out row);
+
+                string cellValue = model.GetCellValue(name).ToString();
+
+                view.SetCellValue(col, row, cellValue);
+            }
         }
 
         /// <summary>
@@ -159,10 +185,27 @@ namespace SSGui
 
             view.SelectedCellName = cellName;
             view.SelectedCellValue = model.GetCellValue(cellName).ToString();
+            SetSelectedCellContents(cellName);            
+        }
 
+        /// <summary>
+        /// Returns the cell name corresponding to col and row
+        /// </summary>
+        private string GetCellNameFromIndices(int col, int row)
+        {
+            char columnChar = (char)(col + 65);
+            return columnChar.ToString() + (row + 1);
+        }
+
+        /// <summary>
+        /// Updates the selected cell contents in the view from the model given the cell's name.
+        /// If the contents is a Formula, appends "=" to the beginning of the string.
+        /// </summary>
+        private void SetSelectedCellContents(string cellName)
+        {
             object cellContents = model.GetCellContents(cellName);
             string stringCellContents;
-            
+
             // Append "=" if the contents is a formula
             if (cellContents.GetType() == typeof(Formula))
             {
@@ -175,15 +218,6 @@ namespace SSGui
             }
 
             view.SelectedCellContents = stringCellContents;
-        }
-
-        /// <summary>
-        /// Returns the cell name corresponding to col and row
-        /// </summary>
-        private string GetCellNameFromIndices(int col, int row)
-        {
-            char columnChar = (char)(col + 65);
-            return columnChar.ToString() + (row + 1);
         }
     }
 }
