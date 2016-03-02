@@ -1,5 +1,6 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SSGui;
 
@@ -188,9 +189,103 @@ namespace SSControllerTester
             Assert.AreEqual("20", view.GetCellValue(2, 2));
         }
 
-        // TODO add tests to increase code coverage!  a couple save tests should do a lot
+        /// <summary>
+        /// Tests the save feature on a new spreadsheet
+        /// </summary>
+        [TestMethod]
+        public void TestControllerSave1()
+        {
+            var view = new SSView();
+            var controller = new Controller(view);
 
+            view.FireSaveEvent();
 
+            Assert.IsTrue(view.CalledDoSaveAs);
+        }
+
+        /// <summary>
+        /// Open file, then save without changing it
+        /// </summary>
+        [TestMethod]
+        public void TestControllerSave2()
+        {
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+
+            OpenFile(DATA_FOLDER + "open2.ss", initialView, out openedFileView);
+
+            openedFileView.FireSaveEvent();
+
+            Assert.IsFalse(openedFileView.CalledDoSaveAs);
+        }
+
+        /// <summary>
+        /// Open file, then save after changing it
+        /// </summary>
+        [TestMethod]
+        public void TestControllerSave3()
+        {
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+
+            OpenFile(DATA_FOLDER + "open2.ss", initialView, out openedFileView);
+
+            var previousSavedTime = File.GetLastWriteTime(DATA_FOLDER + "open2.ss");
+
+            // Change a cell's contents
+            openedFileView.FireCellSelectionChangedEvent(20, 80);
+            openedFileView.SelectedCellContents = "55";
+            openedFileView.FireSetContentsEvent(20, 80);
+
+            // Change it back to preserve the original file
+            openedFileView.FireCellSelectionChangedEvent(20, 80);
+            openedFileView.SelectedCellContents = "";
+            openedFileView.FireSetContentsEvent(20, 80);
+
+            openedFileView.FireSaveEvent();
+
+            var currentSavedTime = File.GetLastWriteTime(DATA_FOLDER + "open2.ss");
+
+            Assert.IsFalse(openedFileView.CalledDoSaveAs);
+            Assert.AreNotEqual(previousSavedTime, currentSavedTime); // the file should be newly saved
+        }
+
+        /// <summary>
+        /// Open file, then save as after changing it
+        /// </summary>
+        [TestMethod]
+        public void TestControllerSaveAs1()
+        {
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+            var filePath = DATA_FOLDER + "open2.ss";
+
+            OpenFile(filePath, initialView, out openedFileView);
+
+            var previousSavedTime = File.GetLastWriteTime(filePath);
+
+            // Change a cell's contents
+            openedFileView.FireCellSelectionChangedEvent(20, 80);
+            openedFileView.SelectedCellContents = "55";
+            openedFileView.FireSetContentsEvent(20, 80);
+
+            // Change it back to preserve the original file
+            openedFileView.FireCellSelectionChangedEvent(20, 80);
+            openedFileView.SelectedCellContents = "";
+            openedFileView.FireSetContentsEvent(20, 80);
+
+            openedFileView.FireSaveAsEvent(filePath);
+
+            var currentSavedTime = File.GetLastWriteTime(filePath);
+
+            Assert.IsFalse(openedFileView.CalledDoSaveAs);
+            Assert.AreNotEqual(previousSavedTime, currentSavedTime); // the file should be newly saved
+        }
+
+        // TODO test that exceptions are handled
 
         /// <summary>
         /// Mimics how the real view opens a file in a new window.

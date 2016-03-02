@@ -3,6 +3,8 @@
 using System;
 using System.Windows.Forms;
 
+// TODO override close to prompt for save unsaved sheet
+
 namespace SSGui
 {
     /// <summary>

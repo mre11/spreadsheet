@@ -151,7 +151,18 @@ namespace SSControllerTester
         /// <summary>
         /// Fires the event
         /// </summary>
-        public void FireSaveFileEvent(string fileName)
+        public void FireSaveEvent()
+        {
+            if (SaveEvent != null)
+            {
+                SaveEvent();
+            }
+        }
+
+        /// <summary>
+        /// Fires the event
+        /// </summary>
+        public void FireSaveAsEvent(string fileName)
         {
             if (SaveAsEvent != null)
             {
@@ -218,6 +229,8 @@ namespace SSControllerTester
         public void DoSaveAs()
         {
             CalledDoSaveAs = true;
+            // just save it to the default since stub doesn't have a save as dialog
+            FireSaveAsEvent("stub_" + DefaultOpenSaveFileName);
         }
 
         public void DoClose()
