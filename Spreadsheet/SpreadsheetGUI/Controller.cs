@@ -25,9 +25,19 @@ namespace SSGui
         private Spreadsheet model;
 
         /// <summary>
+        /// The file path of this spreadsheet
+        /// </summary>
+        private string CurrentFilePath { get; set; }
+
+        /// <summary>
         /// The file name of this spreadsheet
         /// </summary>
-        private string FileName { get; set; }
+        private string CurrentFileName
+        {
+            get { return Path.GetFileName(CurrentFilePath); }
+        }
+
+        private const string DEFAULT_FILENAME = "Spreadsheet1.ss";
 
         /// <summary>
         /// Creates a new controller for the spreadsheet window
@@ -36,12 +46,13 @@ namespace SSGui
         {
             model = new Spreadsheet(new Regex(@"^[a-zA-z]+[1-9]+\d*$"));
             view = window;
-            FileName = "Spreadsheet1.ss";
+            CurrentFilePath = DEFAULT_FILENAME;
 
             // Register event handlers
             view.NewFileEvent += HandleNewEvent;
             view.FileChosenEvent += HandleOpenEvent;
-            view.SaveFileEvent += HandleSaveEvent;
+            view.SaveEvent += HandleSaveEvent;
+            view.SaveAsEvent += HandleSaveAsEvent;
             view.CloseEvent += HandleCloseEvent;
             view.HelpContentsEvent += HandleHelpContentsEvent;
             view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
@@ -73,7 +84,7 @@ namespace SSGui
                 view.SetCellValue(col, row, cellValue);
             }
 
-            FileName = Path.GetFileName(path);
+            CurrentFilePath = path;
 
             InitializeView();
         }
@@ -82,7 +93,7 @@ namespace SSGui
         {
             UpdateSelectedCellView();
             SetTitle();
-            view.DefaultOpenSaveFileName = Path.GetFileName(FileName);
+            view.DefaultOpenSaveFileName = CurrentFileName;
         }
 
         /// <summary>
@@ -102,31 +113,48 @@ namespace SSGui
         }
 
         /// <summary>
-        /// Sets the title of the window according to the FileName of this spreadsheet
+        /// Sets the title of the window according to the file name of this spreadsheet
         /// </summary>
         private void SetTitle()
         {
-            view.Title = FileName + " - Spreadsheet";
+            view.Title = CurrentFileName + " - Spreadsheet";
         }
 
         /// <summary>
-        /// Handles a save file event
+        /// Saves the spreadsheet to the current file path.
         /// </summary>
-        private void HandleSaveEvent(string path)
+        private void HandleSaveEvent()
         {
-            // TODO implement a Save in addition to save as?
+            if (CurrentFilePath == DEFAULT_FILENAME) // the file has not been saved yet
+            {
+                view.DoSaveAs();
+            }
+            else if (model.Changed)
+            {
+                model.Save(new StreamWriter(CurrentFilePath));
+            }
+        }
+
+        /// <summary>
+        /// Saves the spreadsheet to file at the specified path
+        /// </summary>
+        private void HandleSaveAsEvent(string path)
+        {
             if (model.Changed || PathIsDifferent(path))
             {
                 model.Save(new StreamWriter(path));
-                FileName = Path.GetFileName(path);
-                view.DefaultOpenSaveFileName = FileName;
+                CurrentFilePath = path;
+                view.DefaultOpenSaveFileName = CurrentFileName;
                 SetTitle();
             }
         }
 
+        /// <summary>
+        /// Returns true if path is not equal to the current file path
+        /// </summary>
         private bool PathIsDifferent(string path)
         {
-            return path != Path.GetDirectoryName(path) + "\\" + FileName;
+            return path != CurrentFilePath;
         }
 
         /// <summary>

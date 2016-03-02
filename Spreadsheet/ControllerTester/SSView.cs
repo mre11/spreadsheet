@@ -42,6 +42,11 @@ namespace SSControllerTester
         public bool CalledDoNew { get; private set; }
 
         /// <summary>
+        /// Records whether DoSaveAs was called
+        /// </summary>
+        public bool CalledDoSaveAs { get; private set; }
+
+        /// <summary>
         /// Records whether DoClose was called
         /// </summary>
         public bool CalledDoClose { get; private set; }
@@ -60,7 +65,7 @@ namespace SSControllerTester
         /// Default file name that would be shown in open or save as file dialogs
         /// </summary>
         public string DefaultOpenSaveFileName { get; set; }
-
+        
         /// <summary>
         /// Creates an empty SSView
         /// </summary>
@@ -87,11 +92,12 @@ namespace SSControllerTester
 
         public event Action NewFileEvent;
         public event Action<string> FileChosenEvent;
-        public event Action<string> SaveFileEvent;
+        public event Action SaveEvent;
+        public event Action<string> SaveAsEvent;
         public event Action CloseEvent;
         public event Action HelpContentsEvent;
         public event Action<int, int> SetContentsEvent;
-        public event Action<int, int> CellSelectionChangedEvent;
+        public event Action<int, int> CellSelectionChangedEvent;        
 
         /// <summary>
         /// Sets the cell at col and row to the given value
@@ -136,9 +142,9 @@ namespace SSControllerTester
         /// </summary>
         public void FireSaveFileEvent(string fileName)
         {
-            if (SaveFileEvent != null)
+            if (SaveAsEvent != null)
             {
-                SaveFileEvent(fileName);
+                SaveAsEvent(fileName);
             }
         }
 
@@ -189,6 +195,11 @@ namespace SSControllerTester
         public void DoNew()
         {
             CalledDoNew = true;
+        }
+
+        public void DoSaveAs()
+        {
+            CalledDoSaveAs = true;
         }
 
         public void DoClose()

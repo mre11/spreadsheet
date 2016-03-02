@@ -21,7 +21,9 @@ namespace SSGui
 
         event Action<string> FileChosenEvent;
 
-        event Action<string> SaveFileEvent;
+        event Action SaveEvent;
+
+        event Action<string> SaveAsEvent;
 
         event Action CloseEvent;
 
@@ -36,6 +38,8 @@ namespace SSGui
         void DoNew();
 
         void DoOpen(string path);
+
+        void DoSaveAs();
 
         void DoClose();
 

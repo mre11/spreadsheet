@@ -86,11 +86,12 @@ namespace SSGui
 
         public event Action NewFileEvent;
         public event Action<string> FileChosenEvent;
-        public event Action<string> SaveFileEvent;
+        public event Action SaveEvent;
+        public event Action<string> SaveAsEvent;
         public event Action CloseEvent;
         public event Action HelpContentsEvent;
         public event Action<int, int> SetContentsEvent;
-        public event Action<int, int> CellSelectionChangedEvent;
+        public event Action<int, int> CellSelectionChangedEvent;        
 
         /// <summary>
         /// Event handler for New
@@ -119,18 +120,19 @@ namespace SSGui
         }
 
         /// <summary>
+        /// Event handler for Save
+        /// </summary>
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            SaveEvent();
+        }
+
+        /// <summary>
         /// Event handler for Save As
         /// </summary>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = saveAsFileDialog.ShowDialog();
-            if (result == DialogResult.Yes || result == DialogResult.OK)
-            {
-                if (SaveFileEvent != null)
-                {
-                    SaveFileEvent(saveAsFileDialog.FileName);
-                }
-            }
+            DoSaveAs();
         }
 
         /// <summary>
@@ -212,6 +214,21 @@ namespace SSGui
         public void DoOpen(string path)
         {
             SpreadsheetApplicationContext.GetContext().RunOpen(path);
+        }
+
+        /// <summary>
+        /// Brings up a SaveAs dialog
+        /// </summary>
+        public void DoSaveAs()
+        {
+            DialogResult result = saveAsFileDialog.ShowDialog();
+            if (result == DialogResult.Yes || result == DialogResult.OK)
+            {
+                if (SaveAsEvent != null)
+                {
+                    SaveAsEvent(saveAsFileDialog.FileName);
+                }
+            }
         }
 
         /// <summary>
