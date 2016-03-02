@@ -205,5 +205,15 @@ namespace SSControllerTester
         {
             CalledShowErrorMessage = true;
         }
+
+        public void DoOpen(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetSelectedCell(out int col, out int row)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

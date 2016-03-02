@@ -207,6 +207,14 @@ namespace SSGui
         }
 
         /// <summary>
+        /// Opens a new spreadsheet window for the file at path
+        /// </summary>
+        public void DoOpen(string path)
+        {
+            SpreadsheetApplicationContext.GetContext().RunOpen(path);
+        }
+
+        /// <summary>
         /// Closes this window
         /// </summary>
         public void DoClose()
@@ -229,6 +237,14 @@ namespace SSGui
         public void ShowErrorMessage(string message, string title)
         {
             MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        /// <summary>
+        /// Sets col and row to the currently selected cell's coordinates.
+        /// </summary>
+        public void GetSelectedCell(out int col, out int row)
+        {
+            spreadsheetPanel.GetSelection(out col, out row);
         }
     }
 }

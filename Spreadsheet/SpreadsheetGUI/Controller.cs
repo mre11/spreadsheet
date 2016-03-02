@@ -46,9 +46,41 @@ namespace SSGui
             view.HelpContentsEvent += HandleHelpContentsEvent;
             view.CellSelectionChangedEvent += HandleSelectionChangedEvent;
             view.SetContentsEvent += HandleSetContentsEvent;
+            
+            InitializeView();
+        }
 
-            // Initialize view
-            UpdateSelectedCellView("A1");
+        public Controller(ISpreadsheetView window, string path)
+            : this(window)
+        {
+            try
+            {
+                model = new Spreadsheet(new StreamReader(path));
+            }
+            catch (Exception e)
+            {
+                // TODO better error message?
+                view.ShowErrorMessage(e.Message, "Error");
+            }
+
+            // Set values in view for all non-empty cells
+            foreach (string cellName in model.GetNamesOfAllNonemptyCells())
+            {
+                int col, row;
+                GetCellIndicesFromName(cellName, out col, out row);
+
+                string cellValue = model.GetCellValue(cellName).ToString();
+                view.SetCellValue(col, row, cellValue);
+            }
+
+            FileName = Path.GetFileName(path);
+
+            InitializeView();
+        }
+
+        private void InitializeView()
+        {
+            UpdateSelectedCellView();
             SetTitle();
             view.DefaultOpenSaveFileName = Path.GetFileName(FileName);
         }
@@ -66,32 +98,7 @@ namespace SSGui
         /// </summary>
         private void HandleOpenEvent(string path)
         {
-            // TODO open should open in a new window :(
-
-            try
-            {
-                model = new Spreadsheet(new StreamReader(path));
-            }
-            catch (Exception e)
-            {
-                // TODO better error message?
-                view.ShowErrorMessage(e.Message, "Error");
-            }
-
-            foreach(string cellName in model.GetNamesOfAllNonemptyCells())
-            {
-                int col, row;
-                GetCellIndicesFromName(cellName, out col, out row);
-
-                string cellValue = model.GetCellValue(cellName).ToString();
-                view.SetCellValue(col, row, cellValue);
-            }
-            
-            FileName = Path.GetFileName(path);
-            SetTitle();
-
-            // When the file is opened, set the name, value, and contents boxes
-            HandleSelectionChangedEvent(0, 0);
+            view.DoOpen(path);
         }
 
         /// <summary>
@@ -113,7 +120,8 @@ namespace SSGui
                 model.Save(new StreamWriter(path));
                 FileName = Path.GetFileName(path);
                 view.DefaultOpenSaveFileName = FileName;
-            }            
+                SetTitle();
+            }
         }
 
         private bool PathIsDifferent(string path)
@@ -158,7 +166,7 @@ namespace SSGui
 
             // Update any cell values in the view that need updating
             UpdateCellValuesInView(cellsToUpdate);
-            UpdateSelectedCellView(cellName);
+            UpdateSelectedCellView();
         }
 
         /// <summary>
@@ -195,7 +203,7 @@ namespace SSGui
         {
             var cellName = GetCellNameFromIndices(col, row);            
 
-            UpdateSelectedCellView(cellName);
+            UpdateSelectedCellView();
         }
 
         /// <summary>
@@ -233,8 +241,14 @@ namespace SSGui
         /// <summary>
         /// Updates the selected cell name, value, and contents in the view from the model.
         /// </summary>
-        private void UpdateSelectedCellView(string cellName)
+        private void UpdateSelectedCellView()
         {
+            // Get the selected cell's name
+            int col, row;
+            view.GetSelectedCell(out col, out row);
+            var cellName = GetCellNameFromIndices(col, row);
+
+            // Update the boxes
             view.SelectedCellName = cellName;
             view.SelectedCellValue = model.GetCellValue(cellName).ToString();
             SetSelectedCellContents(cellName);

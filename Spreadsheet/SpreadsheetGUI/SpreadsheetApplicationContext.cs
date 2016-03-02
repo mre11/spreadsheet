@@ -56,6 +56,22 @@ namespace SSGui
         }
 
         /// <summary>
+        /// Creates a new Spreadsheet window from the existing file at path
+        /// </summary>
+        public void RunOpen(string path)
+        {
+            var window = new SpreadsheetWindow();
+
+            new Controller(window, path);
+
+            windowCount++;
+
+            window.FormClosed += HandleFormClosed;
+
+            window.Show();
+        }
+
+        /// <summary>
         /// Handles the event of a Spreadsheet window being closed
         /// </summary>
         private void HandleFormClosed(object sender, FormClosedEventArgs e)

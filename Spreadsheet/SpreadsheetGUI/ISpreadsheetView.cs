@@ -35,10 +35,14 @@ namespace SSGui
 
         void DoNew();
 
+        void DoOpen(string path);
+
         void DoClose();
 
         void DoHelpContents();
 
         void ShowErrorMessage(string message, string title);
+
+        void GetSelectedCell(out int col, out int row);        
     }
 }
