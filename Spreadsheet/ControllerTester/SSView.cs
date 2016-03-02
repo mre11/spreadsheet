@@ -22,6 +22,11 @@ namespace SSControllerTester
         public string Title { get; set; }
 
         /// <summary>
+        /// The column and row of the selected cell
+        /// </summary>
+        private int[] SelectedCell { get; set; }
+
+        /// <summary>
         /// The displayed name of the currently selected cell
         /// </summary>
         public string SelectedCellName { get; set; }
@@ -40,6 +45,11 @@ namespace SSControllerTester
         /// Records whether DoNew was called
         /// </summary>
         public bool CalledDoNew { get; private set; }
+
+        /// <summary>
+        /// Records whether DoOpen was called
+        /// </summary>
+        public bool CalledDoOpen { get; private set; }
 
         /// <summary>
         /// Records whether DoSaveAs was called
@@ -65,7 +75,7 @@ namespace SSControllerTester
         /// Default file name that would be shown in open or save as file dialogs
         /// </summary>
         public string DefaultOpenSaveFileName { get; set; }
-        
+
         /// <summary>
         /// Creates an empty SSView
         /// </summary>
@@ -85,6 +95,7 @@ namespace SSControllerTester
                 }
             }
 
+            SelectedCell = new int[] { 0, 0 };
             SelectedCellName = "A1";
             SelectedCellContents = "";
             SelectedCellValue = "";
@@ -188,6 +199,8 @@ namespace SSControllerTester
         {
             if (CellSelectionChangedEvent != null)
             {
+                SelectedCell[0] = col;
+                SelectedCell[1] = row;
                 CellSelectionChangedEvent(col, row);
             }
         }
@@ -195,6 +208,11 @@ namespace SSControllerTester
         public void DoNew()
         {
             CalledDoNew = true;
+        }
+
+        public void DoOpen(string path)
+        {
+            CalledDoOpen = true;
         }
 
         public void DoSaveAs()
@@ -217,14 +235,10 @@ namespace SSControllerTester
             CalledShowErrorMessage = true;
         }
 
-        public void DoOpen(string path)
-        {
-            throw new NotImplementedException();
-        }
-
         public void GetSelectedCell(out int col, out int row)
         {
-            throw new NotImplementedException();
+            col = SelectedCell[0];
+            row = SelectedCell[1];
         }
     }
 }

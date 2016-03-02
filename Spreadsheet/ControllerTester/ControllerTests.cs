@@ -1,5 +1,6 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SSGui;
 
@@ -62,13 +63,14 @@ namespace SSControllerTester
         [TestMethod]
         public void TestOpen1()
         {
-            var view = new SSView();
-            var controller = new Controller(view);
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
 
-            view.FireFileChosenEvent(DATA_FOLDER + "open1.ss"); // this is an empty spreadsheet
+            OpenFile(DATA_FOLDER + "open1.ss", initialView, out openedFileView); // this is an empty spreadsheet
 
-            Assert.AreEqual("open1.ss - Spreadsheet", view.Title);
-            Assert.AreEqual("", view.GetCellValue(0, 0));
+            Assert.AreEqual("open1.ss - Spreadsheet", openedFileView.Title);
+            Assert.AreEqual("", openedFileView.GetCellValue(0, 0));
         }
 
         /// <summary>
@@ -77,18 +79,19 @@ namespace SSControllerTester
         [TestMethod]
         public void TestOpen2()
         {
-            var view = new SSView();
-            var controller = new Controller(view);
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+            
+            OpenFile(DATA_FOLDER + "open2.ss", initialView, out openedFileView);
 
-            view.FireFileChosenEvent(DATA_FOLDER + "open2.ss");
-
-            Assert.AreEqual("open2.ss - Spreadsheet", view.Title);
-            Assert.AreEqual("12", view.GetCellValue(0, 0));
-            Assert.AreEqual("hello", view.GetCellValue(0, 1));
-            Assert.AreEqual("2.54", view.GetCellValue(1, 21));
-            Assert.AreEqual("2.54", view.GetCellValue(2, 98));
-            Assert.AreEqual("25.4", view.GetCellValue(3, 4));
-            Assert.AreEqual("42", view.GetCellValue(25, 16));
+            Assert.AreEqual("open2.ss - Spreadsheet", openedFileView.Title);
+            Assert.AreEqual("12", openedFileView.GetCellValue(0, 0));
+            Assert.AreEqual("hello", openedFileView.GetCellValue(0, 1));
+            Assert.AreEqual("2.54", openedFileView.GetCellValue(1, 21));
+            Assert.AreEqual("2.54", openedFileView.GetCellValue(2, 98));
+            Assert.AreEqual("25.4", openedFileView.GetCellValue(3, 4));
+            Assert.AreEqual("42", openedFileView.GetCellValue(25, 16));
         }
 
         /// <summary>
@@ -97,44 +100,45 @@ namespace SSControllerTester
         [TestMethod]
         public void TestSelection1()
         {
-            var view = new SSView();
-            var controller = new Controller(view);
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
 
-            view.FireFileChosenEvent(DATA_FOLDER + "open2.ss");
+            OpenFile(DATA_FOLDER + "open2.ss", initialView, out openedFileView);
             
-            Assert.AreEqual("A1", view.SelectedCellName);
-            Assert.AreEqual("12", view.SelectedCellValue);
-            Assert.AreEqual("=3*4", view.SelectedCellContents);
+            Assert.AreEqual("A1", openedFileView.SelectedCellName);
+            Assert.AreEqual("12", openedFileView.SelectedCellValue);
+            Assert.AreEqual("=3*4", openedFileView.SelectedCellContents);
 
-            view.FireCellSelectionChangedEvent(1, 21);
+            openedFileView.FireCellSelectionChangedEvent(1, 21);
 
-            Assert.AreEqual("B22", view.SelectedCellName);
-            Assert.AreEqual("2.54", view.SelectedCellValue);
-            Assert.AreEqual("2.54", view.SelectedCellContents);
+            Assert.AreEqual("B22", openedFileView.SelectedCellName);
+            Assert.AreEqual("2.54", openedFileView.SelectedCellValue);
+            Assert.AreEqual("2.54", openedFileView.SelectedCellContents);
 
-            view.FireCellSelectionChangedEvent(2, 98);
+            openedFileView.FireCellSelectionChangedEvent(2, 98);
 
-            Assert.AreEqual("C99", view.SelectedCellName);
-            Assert.AreEqual("2.54", view.SelectedCellValue);
-            Assert.AreEqual("=B22", view.SelectedCellContents);
+            Assert.AreEqual("C99", openedFileView.SelectedCellName);
+            Assert.AreEqual("2.54", openedFileView.SelectedCellValue);
+            Assert.AreEqual("=B22", openedFileView.SelectedCellContents);
 
-            view.FireCellSelectionChangedEvent(3, 4);
+            openedFileView.FireCellSelectionChangedEvent(3, 4);
 
-            Assert.AreEqual("D5", view.SelectedCellName);
-            Assert.AreEqual("25.4", view.SelectedCellValue);
-            Assert.AreEqual("=B22*10", view.SelectedCellContents);
+            Assert.AreEqual("D5", openedFileView.SelectedCellName);
+            Assert.AreEqual("25.4", openedFileView.SelectedCellValue);
+            Assert.AreEqual("=B22*10", openedFileView.SelectedCellContents);
 
-            view.FireCellSelectionChangedEvent(25, 16);
+            openedFileView.FireCellSelectionChangedEvent(25, 16);
 
-            Assert.AreEqual("Z17", view.SelectedCellName);
-            Assert.AreEqual("42", view.SelectedCellValue);
-            Assert.AreEqual("=40+2", view.SelectedCellContents);
+            Assert.AreEqual("Z17", openedFileView.SelectedCellName);
+            Assert.AreEqual("42", openedFileView.SelectedCellValue);
+            Assert.AreEqual("=40+2", openedFileView.SelectedCellContents);
 
-            view.FireCellSelectionChangedEvent(0, 1);
+            openedFileView.FireCellSelectionChangedEvent(0, 1);
 
-            Assert.AreEqual("A2", view.SelectedCellName);
-            Assert.AreEqual("hello", view.SelectedCellValue);
-            Assert.AreEqual("hello", view.SelectedCellContents);
+            Assert.AreEqual("A2", openedFileView.SelectedCellName);
+            Assert.AreEqual("hello", openedFileView.SelectedCellValue);
+            Assert.AreEqual("hello", openedFileView.SelectedCellContents);
         }
 
         /// <summary>
@@ -186,5 +190,18 @@ namespace SSControllerTester
         }
 
         // TODO add tests to increase code coverage!
+
+
+
+        /// <summary>
+        /// Mimics how the real view opens a file in a new window.
+        /// </summary>
+        private void OpenFile(string path, SSView oldView, out SSView newView)
+        {
+            oldView.FireFileChosenEvent(path);
+
+            newView = new SSView();
+            var newController = new Controller(newView, path);
+        }
     }    
 }
