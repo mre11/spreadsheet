@@ -2,7 +2,7 @@
 
 namespace SSGui
 {
-    partial class Help
+    partial class HelpWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -44,7 +44,7 @@ namespace SSGui
             string currentDirectory = Directory.GetCurrentDirectory();
             this.helpBrowser.Url = new System.Uri("file://" + currentDirectory + "/contents.html", System.UriKind.Absolute);
             // 
-            // Help
+            // HelpWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

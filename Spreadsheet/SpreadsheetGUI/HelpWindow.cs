@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace SSGui
 {
-    public partial class Help : Form
+    public partial class HelpWindow : Form
     {
-        public Help()
+        public HelpWindow()
         {
             InitializeComponent();
         }

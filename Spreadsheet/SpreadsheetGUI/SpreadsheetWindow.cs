@@ -81,9 +81,7 @@ namespace SSGui
                 CellSelectionChangedEvent(col, row);
             }
         }
-
-        private Form helpWindow = new Help();
-
+        
         public event Action NewFileEvent;
         public event Action<string> FileChosenEvent;
         public event Action SaveEvent;
@@ -244,8 +242,7 @@ namespace SSGui
         /// </summary>
         public void DoHelpContents()
         {
-            helpWindow.Show();
-            // TODO write help contents
+            new HelpWindow().Show();
         }
 
         /// <summary>

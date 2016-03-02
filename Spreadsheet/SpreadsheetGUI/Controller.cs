@@ -1,4 +1,5 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
+// TODO clean up all code!  add comments!
 
 using System.Text.RegularExpressions;
 using SS;
@@ -37,6 +38,9 @@ namespace SSGui
             get { return Path.GetFileName(CurrentFilePath); }
         }
 
+        /// <summary>
+        /// The default file name for this spreadsheet
+        /// </summary>
         private const string DEFAULT_FILENAME = "Spreadsheet1.ss";
 
         /// <summary>
@@ -66,11 +70,13 @@ namespace SSGui
         {
             try
             {
-                model = new Spreadsheet(new StreamReader(path));
+                using (var reader = new StreamReader(path))
+                {
+                    model = new Spreadsheet(reader);
+                }
             }
             catch (Exception e)
             {
-                // TODO better error message?
                 view.ShowErrorMessage(e.Message, "Error");
             }
 
@@ -131,7 +137,7 @@ namespace SSGui
             }
             else if (model.Changed)
             {
-                model.Save(new StreamWriter(CurrentFilePath));
+                TrySaveFile(CurrentFilePath);
             }
         }
 
@@ -142,10 +148,28 @@ namespace SSGui
         {
             if (model.Changed || PathIsDifferent(path))
             {
-                model.Save(new StreamWriter(path));
+                TrySaveFile(path);                
                 CurrentFilePath = path;
                 view.DefaultOpenSaveFileName = CurrentFileName;
                 SetTitle();
+            }
+        }
+
+        /// <summary>
+        /// Tries to write the spreadsheet to file. Shows an error message if an exception is thrown.
+        /// </summary>
+        private void TrySaveFile(string path)
+        {
+            try
+            {
+                using (var writer = new StreamWriter(path))
+                {
+                    model.Save(writer);
+                }
+            }
+            catch (Exception)
+            {
+                view.ShowErrorMessage("Error saving file", "Error");
             }
         }
 
@@ -188,7 +212,6 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                // TODO better error message?
                 view.ShowErrorMessage(e.Message, "Error");
             }
 
