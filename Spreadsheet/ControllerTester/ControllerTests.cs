@@ -1,6 +1,5 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SSGui;
 
@@ -189,7 +188,7 @@ namespace SSControllerTester
             Assert.AreEqual("20", view.GetCellValue(2, 2));
         }
 
-        // TODO add tests to increase code coverage!
+        // TODO add tests to increase code coverage!  a couple save tests should do a lot
 
 
 
