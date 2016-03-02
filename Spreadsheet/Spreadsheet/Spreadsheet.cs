@@ -223,7 +223,7 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, Formula formula)
         {
-            return SetCellContents(name, (object) formula);
+            return SetCellContentsShared(name, (object) formula);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, string text)
         {
-            return SetCellContents(name, (object) text);
+            return SetCellContentsShared(name, (object) text);
         }
 
         /// <summary>
@@ -255,14 +255,14 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, double number)
         {
-            return SetCellContents(name, (object) number);            
+            return SetCellContentsShared(name, (object) number);            
         }
 
         /// <summary>
         /// Helper method for SetCellContents protected methods. Method assumes that
         /// the caller has already checked for null and invalid parameters.
         /// </summary>
-        private ISet<string> SetCellContents(string name, object contents)
+        private ISet<string> SetCellContentsShared(string name, object contents)
         {
             var normalizedName = name.ToUpper();
 
