@@ -1,6 +1,7 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
 using System;
+using System.Windows.Forms;
 using SSGui;
 
 namespace SSControllerTester
@@ -57,11 +58,6 @@ namespace SSControllerTester
         public bool CalledDoSaveAs { get; private set; }
 
         /// <summary>
-        /// Records whether DoClose was called
-        /// </summary>
-        public bool CalledDoClose { get; private set; }
-
-        /// <summary>
         /// Records whether DoHelpContents was called
         /// </summary>
         public bool CalledHelpContents { get; private set; }
@@ -75,6 +71,11 @@ namespace SSControllerTester
         /// Default file name that would be shown in open or save as file dialogs
         /// </summary>
         public string DefaultOpenSaveFileName { get; set; }
+
+        /// <summary>
+        /// Records if the warning for unsaved file is shown on close.
+        /// </summary>
+        public bool ShowedCloseWarning { get; private set; }
 
         /// <summary>
         /// Creates an empty SSView
@@ -105,7 +106,7 @@ namespace SSControllerTester
         public event Action<string> FileChosenEvent;
         public event Action SaveEvent;
         public event Action<string> SaveAsEvent;
-        public event Action CloseEvent;
+        public event Action<FormClosingEventArgs> CloseEvent;
         public event Action HelpContentsEvent;
         public event Action<int, int> SetContentsEvent;
         public event Action<int, int> CellSelectionChangedEvent;        
@@ -177,7 +178,7 @@ namespace SSControllerTester
         {
             if (CloseEvent != null)
             {
-                CloseEvent();
+                CloseEvent(new FormClosingEventArgs(CloseReason.UserClosing, false));
             }
         }
 
@@ -233,11 +234,6 @@ namespace SSControllerTester
             FireSaveAsEvent("stub_" + DefaultOpenSaveFileName);
         }
 
-        public void DoClose()
-        {
-            CalledDoClose = true;
-        }
-
         public void DoHelpContents()
         {
             CalledHelpContents = true;
@@ -252,6 +248,12 @@ namespace SSControllerTester
         {
             col = SelectedCell[0];
             row = SelectedCell[1];
+        }
+
+        public DialogResult ShowCloseWarning()
+        {
+            ShowedCloseWarning = true;
+            return DialogResult.Yes;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SSControllerTester
         }
 
         /// <summary>
-        /// Tests the close event
+        /// Tests the close event for an unchanged file
         /// </summary>
         [TestMethod]
         public void TestClose1()
@@ -40,7 +40,24 @@ namespace SSControllerTester
 
             view.FireCloseEvent();
 
-            Assert.IsTrue(view.CalledDoClose);
+            Assert.IsFalse(view.ShowedCloseWarning);
+        }
+
+        /// <summary>
+        /// Tests the close event for a changed file
+        /// </summary>
+        [TestMethod]
+        public void TestClose2()
+        {
+            var view = new SSView();
+            var controller = new Controller(view);
+
+            view.SelectedCellContents = "hello";
+            view.FireSetContentsEvent(0, 0);
+
+            view.FireCloseEvent();
+
+            Assert.IsTrue(view.ShowedCloseWarning);
         }
 
         /// <summary>

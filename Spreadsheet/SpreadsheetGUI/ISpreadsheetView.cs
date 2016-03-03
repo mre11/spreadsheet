@@ -1,6 +1,7 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
 using System;
+using System.Windows.Forms;
 
 namespace SSGui
 {
@@ -25,7 +26,7 @@ namespace SSGui
 
         event Action<string> SaveAsEvent;
 
-        event Action CloseEvent;
+        event Action<FormClosingEventArgs> CloseEvent;
 
         event Action HelpContentsEvent;
 
@@ -41,12 +42,13 @@ namespace SSGui
 
         void DoSaveAs();
 
-        void DoClose();
+        DialogResult ShowCloseWarning();
 
         void DoHelpContents();
 
         void ShowErrorMessage(string message, string title);
 
-        void GetSelectedCell(out int col, out int row);        
+        void GetSelectedCell(out int col, out int row);
+        
     }
 }

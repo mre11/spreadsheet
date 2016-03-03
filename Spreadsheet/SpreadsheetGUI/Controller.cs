@@ -7,6 +7,7 @@ using System.IO;
 using Formulas;
 using System.Collections.Generic;
 using System;
+using System.Windows.Forms;
 
 namespace SSGui
 {
@@ -77,7 +78,7 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                view.ShowErrorMessage(e.Message, "Error");
+                view.ShowErrorMessage(e.Message, "Spreadsheet");
             }
 
             // Set values in view for all non-empty cells
@@ -169,7 +170,7 @@ namespace SSGui
             }
             catch (Exception)
             {
-                view.ShowErrorMessage("Error saving file", "Error");
+                view.ShowErrorMessage("Error saving file", "Spreadsheet");
             }
         }
 
@@ -184,9 +185,16 @@ namespace SSGui
         /// <summary>
         /// Handles a close window event
         /// </summary>
-        private void HandleCloseEvent()
+        private void HandleCloseEvent(FormClosingEventArgs e)
         {
-            view.DoClose();
+            if (model.Changed)
+            {
+                DialogResult result = view.ShowCloseWarning();
+                if (result == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         /// <summary>
@@ -212,7 +220,7 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                view.ShowErrorMessage(e.Message, "Error");
+                view.ShowErrorMessage(e.Message, "Spreadsheet");
             }
 
             // Update any cell values in the view that need updating

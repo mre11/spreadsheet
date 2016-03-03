@@ -3,8 +3,6 @@
 using System;
 using System.Windows.Forms;
 
-// TODO override close to prompt for save unsaved sheet
-
 namespace SSGui
 {
     /// <summary>
@@ -88,7 +86,7 @@ namespace SSGui
         public event Action<string> FileChosenEvent;
         public event Action SaveEvent;
         public event Action<string> SaveAsEvent;
-        public event Action CloseEvent;
+        public event Action<FormClosingEventArgs> CloseEvent;
         public event Action HelpContentsEvent;
         public event Action<int, int> SetContentsEvent;
         public event Action<int, int> CellSelectionChangedEvent;        
@@ -140,10 +138,7 @@ namespace SSGui
         /// </summary>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CloseEvent != null)
-            {
-                CloseEvent();
-            }
+            Close();
         }
 
         /// <summary>
@@ -232,14 +227,6 @@ namespace SSGui
         }
 
         /// <summary>
-        /// Closes this window
-        /// </summary>
-        public void DoClose()
-        {
-            Close();
-        }
-
-        /// <summary>
         /// Displays the help contents
         /// </summary>
         public void DoHelpContents()
@@ -252,7 +239,7 @@ namespace SSGui
         /// </summary>
         public void ShowErrorMessage(string message, string title)
         {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         /// <summary>
@@ -260,7 +247,20 @@ namespace SSGui
         /// </summary>
         public void GetSelectedCell(out int col, out int row)
         {
-            spreadsheetPanel.GetSelection(out col, out row);
+            spreadsheetPanel.GetSelection(out col, out row);            
+        }
+
+        private void SpreadsheetWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (CloseEvent != null)
+            {
+                CloseEvent(e);
+            }
+        }
+
+        public DialogResult ShowCloseWarning()
+        {
+            return MessageBox.Show("Unsaved changes. Are you sure you want to close?", "Spreadsheet", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
         }
     }
 }
