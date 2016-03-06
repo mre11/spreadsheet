@@ -103,6 +103,8 @@ namespace SSControllerTester
             
             OpenFile(DATA_FOLDER + "open2.ss", initialView, out openedFileView);
 
+            Assert.IsTrue(initialView.CalledDoOpen);
+
             Assert.AreEqual("open2.ss - Spreadsheet", openedFileView.Title);
             Assert.AreEqual("12", openedFileView.GetCellValue(0, 0));
             Assert.AreEqual("hello", openedFileView.GetCellValue(0, 1));
@@ -123,10 +125,7 @@ namespace SSControllerTester
             SSView openedFileView;
             var controller = new Controller(initialView);
 
-            OpenFile(DATA_FOLDER + "read5.xml", initialView, out openedFileView);
-
-            Assert.IsTrue(initialView.CalledDoOpen);
-            Assert.IsTrue(openedFileView.CalledShowErrorMessage);
+            OpenFile(DATA_FOLDER + "read5.xml", initialView, out openedFileView);           
         }
 
 
@@ -360,14 +359,13 @@ namespace SSControllerTester
             Assert.IsTrue(openedFileView.CalledShowErrorMessage);            
         }
 
-        // TODO test that exceptions are handled
-
         /// <summary>
         /// Mimics how the real view opens a file in a new window.
         /// </summary>
         private void OpenFile(string path, SSView oldView, out SSView newView)
         {
             oldView.FireOpenEvent(path);
+            Assert.IsTrue(oldView.CalledDoOpen);
 
             newView = new SSView();
             var newController = new Controller(newView, path);

@@ -178,10 +178,10 @@ namespace GradingTests
                 s.SetContentsOfCell("A3", "30");
                 s.SetContentsOfCell("A2", "=A3*A1");
             }
-            catch (CircularException e)
+            catch (CircularException)
             {
                 Assert.AreEqual(15, (double)s.GetCellContents("A2"), 1e-9);
-                throw e;
+                throw;
             }
         }
 
