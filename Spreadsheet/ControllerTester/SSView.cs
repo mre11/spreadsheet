@@ -103,7 +103,7 @@ namespace SSControllerTester
         }
 
         public event Action NewFileEvent;
-        public event Action<string> FileChosenEvent;
+        public event Action<string> OpenEvent;
         public event Action SaveEvent;
         public event Action<string> SaveAsEvent;
         public event Action<FormClosingEventArgs> CloseEvent;
@@ -143,9 +143,9 @@ namespace SSControllerTester
         /// </summary>
         public void FireFileChosenEvent(string fileName)
         {
-            if (FileChosenEvent != null)
+            if (OpenEvent != null)
             {
-                FileChosenEvent(fileName);
+                OpenEvent(fileName);
             }
         }
 
@@ -217,39 +217,60 @@ namespace SSControllerTester
             }
         }
 
+        /// <summary>
+        /// Sets property to true if called
+        /// </summary>
         public void DoNew()
         {
             CalledDoNew = true;
         }
 
+        /// <summary>
+        /// Sets property to true if called
+        /// </summary>
         public void DoOpen(string path)
         {
             CalledDoOpen = true;
         }
 
+        /// <summary>
+        /// Sets property to true if called, then fires a SaveAsEvent
+        /// </summary>
         public void DoSaveAs()
         {
             CalledDoSaveAs = true;
-            // just save it to the default since stub doesn't have a save as dialog
+            // save the file to the default since stub doesn't have a save as dialog
             FireSaveAsEvent("stub_" + DefaultOpenSaveFileName);
         }
 
+        /// <summary>
+        /// Sets property to true if called
+        /// </summary>
         public void DoHelpContents()
         {
             CalledHelpContents = true;
         }
 
-        public void ShowErrorMessage(string message, string title)
+        /// <summary>
+        /// Sets property to true if called
+        /// </summary>
+        public void ShowWarningMessage(string message)
         {
             CalledShowErrorMessage = true;
         }
 
+        /// <summary>
+        /// Returns the column and row of the currently-selected cell
+        /// </summary>
         public void GetSelectedCell(out int col, out int row)
         {
             col = SelectedCell[0];
             row = SelectedCell[1];
         }
 
+        /// <summary>
+        /// Sets property to true if called. Simulates a Yes result.
+        /// </summary>
         public DialogResult ShowCloseWarning()
         {
             ShowedCloseWarning = true;

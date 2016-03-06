@@ -58,7 +58,7 @@ namespace SSGui
         /// <summary>
         /// Creates a new Spreadsheet window from the existing file at path
         /// </summary>
-        public void RunOpen(string path)
+        public void RunExisting(string path)
         {
             var window = new SpreadsheetWindow();
 

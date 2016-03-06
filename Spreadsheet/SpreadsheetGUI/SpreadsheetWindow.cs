@@ -67,23 +67,9 @@ namespace SSGui
 
             spreadsheetPanel.SelectionChanged += CellSelectionHandler;
         }
-
-        /// <summary>
-        /// Handles the event of a cell being selected
-        /// </summary>
-        private void CellSelectionHandler(SpreadsheetPanel ssPanel)
-        {
-            int col, row;
-            ssPanel.GetSelection(out col, out row);
-
-            if (CellSelectionChangedEvent != null)
-            {
-                CellSelectionChangedEvent(col, row);
-            }
-        }
-        
+      
         public event Action NewFileEvent;
-        public event Action<string> FileChosenEvent;
+        public event Action<string> OpenEvent;
         public event Action SaveEvent;
         public event Action<string> SaveAsEvent;
         public event Action<FormClosingEventArgs> CloseEvent;
@@ -94,7 +80,7 @@ namespace SSGui
         /// <summary>
         /// Event handler for New
         /// </summary>
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fileNew_Click(object sender, EventArgs e)
         {
             if (NewFileEvent != null)
             {
@@ -105,14 +91,14 @@ namespace SSGui
         /// <summary>
         /// Event handler for Open
         /// </summary>
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fileOpen_Click(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog.ShowDialog();
             if (result == DialogResult.Yes || result == DialogResult.OK)
             {
-                if (FileChosenEvent != null)
+                if (OpenEvent != null)
                 {
-                    FileChosenEvent(openFileDialog.FileName);
+                    OpenEvent(openFileDialog.FileName);
                 }
             }
         }
@@ -120,7 +106,7 @@ namespace SSGui
         /// <summary>
         /// Event handler for Save
         /// </summary>
-        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void fileSave_Click(object sender, EventArgs e)
         {
             SaveEvent();
         }
@@ -128,7 +114,7 @@ namespace SSGui
         /// <summary>
         /// Event handler for Save As
         /// </summary>
-        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fileSaveAs_Click(object sender, EventArgs e)
         {
             DoSaveAs();
         }
@@ -136,7 +122,7 @@ namespace SSGui
         /// <summary>
         /// Event handler for Close
         /// </summary>
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fileClose_Click(object sender, EventArgs e)
         {
             Close();
         }
@@ -144,20 +130,12 @@ namespace SSGui
         /// <summary>
         /// Event handler for Help >> Contents
         /// </summary>
-        private void helpContentsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void helpContents_Click(object sender, EventArgs e)
         {
             if (HelpContentsEvent != null)
             {
                 HelpContentsEvent();
             }
-        }
-
-        /// <summary>
-        /// Sets the cell in the spreadsheet panel at col and row to the specified value
-        /// </summary>
-        public void SetCellValue(int col, int row, string value)
-        {
-            spreadsheetPanel.SetValue(col, row, value);
         }
 
         /// <summary>
@@ -196,6 +174,28 @@ namespace SSGui
         }
 
         /// <summary>
+        /// Handles the event of a cell being selected by firing a CellSelectionChangedEvent.
+        /// </summary>
+        private void CellSelectionHandler(SpreadsheetPanel ssPanel)
+        {
+            int col, row;
+            ssPanel.GetSelection(out col, out row);
+
+            if (CellSelectionChangedEvent != null)
+            {
+                CellSelectionChangedEvent(col, row);
+            }
+        }
+
+        /// <summary>
+        /// Sets the cell in the spreadsheet panel at col and row to the specified value
+        /// </summary>
+        public void SetCellValue(int col, int row, string value)
+        {
+            spreadsheetPanel.SetValue(col, row, value);
+        }
+
+        /// <summary>
         /// Opens a new spreadsheet window
         /// </summary>
         public void DoNew()
@@ -208,11 +208,11 @@ namespace SSGui
         /// </summary>
         public void DoOpen(string path)
         {
-            SpreadsheetApplicationContext.GetContext().RunOpen(path);
+            SpreadsheetApplicationContext.GetContext().RunExisting(path);
         }
 
         /// <summary>
-        /// Brings up a SaveAs dialog
+        /// Displays the Save As dialog
         /// </summary>
         public void DoSaveAs()
         {
@@ -237,9 +237,9 @@ namespace SSGui
         /// <summary>
         /// Shows an error message
         /// </summary>
-        public void ShowErrorMessage(string message, string title)
+        public void ShowWarningMessage(string message)
         {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(message, "Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         /// <summary>
@@ -250,6 +250,9 @@ namespace SSGui
             spreadsheetPanel.GetSelection(out col, out row);            
         }
 
+        /// <summary>
+        /// Handles a FormClosing event by firing a CloseEvent.
+        /// </summary>
         private void SpreadsheetWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (CloseEvent != null)
@@ -258,9 +261,14 @@ namespace SSGui
             }
         }
 
+        /// <summary>
+        /// Displays a warning if closing the window would result in losing unsaved changes.
+        /// Result of yes closes without saving, result of no cancels the close.
+        /// </summary>
         public DialogResult ShowCloseWarning()
         {
-            return MessageBox.Show("Unsaved changes. Are you sure you want to close?", "Spreadsheet", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var message = "Unsaved changes. Are you sure you want to close?";
+            return MessageBox.Show(message, "Spreadsheet", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
         }
     }
 }

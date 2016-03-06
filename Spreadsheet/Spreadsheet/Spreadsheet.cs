@@ -127,6 +127,8 @@ namespace SS
             {
                 throw new IOException("Error reading file");
             }
+
+            Changed = false; // a newly-opened Spreadsheet has not been changed
         }
 
         /// <summary>
