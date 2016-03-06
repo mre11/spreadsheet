@@ -141,7 +141,7 @@ namespace SSControllerTester
         /// <summary>
         /// Fires the event
         /// </summary>
-        public void FireFileChosenEvent(string fileName)
+        public void FireOpenEvent(string fileName)
         {
             if (OpenEvent != null)
             {
@@ -269,12 +269,12 @@ namespace SSControllerTester
         }
 
         /// <summary>
-        /// Sets property to true if called. Simulates a Yes result.
+        /// Sets property to true if called. Simulates a No result.
         /// </summary>
         public DialogResult ShowCloseWarning()
         {
             ShowedCloseWarning = true;
-            return DialogResult.Yes;
+            return DialogResult.No;
         }
     }
 }

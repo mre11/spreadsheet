@@ -2,6 +2,7 @@
 
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SS;
 using SSGui;
 
 namespace SSControllerTester
@@ -91,7 +92,7 @@ namespace SSControllerTester
         }
 
         /// <summary>
-        /// Tests the close event
+        /// Tests the open event for an un-empty spreadsheet file
         /// </summary>
         [TestMethod]
         public void TestOpen2()
@@ -110,6 +111,24 @@ namespace SSControllerTester
             Assert.AreEqual("25.4", openedFileView.GetCellValue(3, 4));
             Assert.AreEqual("42", openedFileView.GetCellValue(25, 16));
         }
+
+        /// <summary>
+        /// Tests the open event for a corrupt file
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestOpen3()
+        {
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+
+            OpenFile(DATA_FOLDER + "read5.xml", initialView, out openedFileView);
+
+            Assert.IsTrue(initialView.CalledDoOpen);
+            Assert.IsTrue(openedFileView.CalledShowErrorMessage);
+        }
+
 
         /// <summary>
         /// Tests SelectionChanged event
@@ -204,6 +223,22 @@ namespace SSControllerTester
             Assert.AreEqual("10", view.SelectedCellValue);
             Assert.AreEqual("10", view.GetCellValue(0, 0));
             Assert.AreEqual("20", view.GetCellValue(2, 2));
+        }
+
+        /// <summary>
+        /// Tests the set contents event (error message)
+        /// </summary>
+        [TestMethod]
+        public void TestSetContents3()
+        {
+            var view = new SSView();
+            var controller = new Controller(view);
+
+            view.FireCellSelectionChangedEvent(0, 0);
+            view.SelectedCellContents = "=A100";
+            view.FireSetContentsEvent(0, 0);
+
+            Assert.IsTrue(view.CalledShowErrorMessage);            
         }
 
         /// <summary>
@@ -302,6 +337,29 @@ namespace SSControllerTester
             Assert.AreNotEqual(previousSavedTime, currentSavedTime); // the file should be newly saved
         }
 
+        /// <summary>
+        /// Test for an error on saving
+        /// </summary>
+        [TestMethod]
+        public void TestControllerSaveAs2()
+        {
+            var initialView = new SSView();
+            SSView openedFileView;
+            var controller = new Controller(initialView);
+            var filePath = DATA_FOLDER + "open2.ss";
+
+            OpenFile(filePath, initialView, out openedFileView);
+
+            // Change a cell's contents
+            openedFileView.FireCellSelectionChangedEvent(20, 80);
+            openedFileView.SelectedCellContents = "55";
+            openedFileView.FireSetContentsEvent(20, 80);
+
+            openedFileView.FireSaveAsEvent(@"Z:\doesNotExist\test.ss");
+            
+            Assert.IsTrue(openedFileView.CalledShowErrorMessage);            
+        }
+
         // TODO test that exceptions are handled
 
         /// <summary>
@@ -309,7 +367,7 @@ namespace SSControllerTester
         /// </summary>
         private void OpenFile(string path, SSView oldView, out SSView newView)
         {
-            oldView.FireFileChosenEvent(path);
+            oldView.FireOpenEvent(path);
 
             newView = new SSView();
             var newController = new Controller(newView, path);

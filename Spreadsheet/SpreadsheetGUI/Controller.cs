@@ -82,6 +82,7 @@ namespace SSGui
             catch (Exception e)
             {
                 view.ShowWarningMessage("File read error: " + e.Message);
+                throw; // propagate the exception so the new window isn't opened by the context
             }
 
             // Set values in view for all non-empty cells
@@ -254,7 +255,7 @@ namespace SSGui
             }
             catch (Exception e)
             {
-                view.ShowWarningMessage(e.Message);
+                view.ShowWarningMessage("Cell contents error: " + e.Message);
             }
 
             // Update any cell values in the view that need updating

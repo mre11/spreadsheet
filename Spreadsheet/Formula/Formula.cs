@@ -137,11 +137,11 @@ namespace Formulas
 
                     if (!IsVariableToken(normalizedToken))
                     {
-                        throw new FormulaFormatException("Normalized variable is not legal");
+                        throw new FormulaFormatException("Invalid variable");
                     }
                     else if (!validator(normalizedToken))
                     {
-                        throw new FormulaFormatException("Validator rejected variable");
+                        throw new FormulaFormatException("Invalid variable");
                     }
                     else
                     {

@@ -1,5 +1,6 @@
 ﻿// Created by Morgan Empey for CS 3500, University of Utah, Spring 2015
 
+using System;
 using System.Windows.Forms;
 
 namespace SSGui
@@ -60,15 +61,19 @@ namespace SSGui
         /// </summary>
         public void RunExisting(string path)
         {
-            var window = new SpreadsheetWindow();
+            try
+            {
+                var window = new SpreadsheetWindow();
 
-            new Controller(window, path);
+                new Controller(window, path);
 
-            windowCount++;
+                windowCount++;
 
-            window.FormClosed += HandleFormClosed;
+                window.FormClosed += HandleFormClosed;
 
-            window.Show();
+                window.Show();
+            }
+            catch (Exception) { }            
         }
 
         /// <summary>
