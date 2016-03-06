@@ -1,0 +1,3 @@
+In GetCellValue, I forgot to convert the cell name parameter to upper-case so that both lower- and upper-case inputs are allowed.
+With this change, I pass the following previously-failed tests:
+
