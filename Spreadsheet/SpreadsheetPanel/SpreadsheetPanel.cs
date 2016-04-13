@@ -127,7 +127,7 @@ namespace SSGui
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            if (FindForm() == null || FindForm().WindowState != FormWindowState.Minimized)
+            if (drawingPanel != null && (FindForm() == null || FindForm().WindowState != FormWindowState.Minimized))
             {
                 drawingPanel.Size = new Size(Width - SCROLLBAR_WIDTH, Height - SCROLLBAR_WIDTH);
                 vScroll.Location = new Point(Width - SCROLLBAR_WIDTH, 0);
