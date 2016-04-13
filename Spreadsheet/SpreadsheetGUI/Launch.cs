@@ -10,14 +10,23 @@ namespace SS
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Run a single context that supports multiple windows
             var appContext = SpreadsheetApplicationContext.GetContext();
-            appContext.RunNew();
+
+            if (args.Length > 0)
+            {
+                appContext.RunExisting(args[0]);
+            }
+            else
+            {
+                appContext.RunNew();
+            }
+            
             Application.Run(appContext);
         }
     }
