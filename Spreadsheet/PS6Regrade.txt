@@ -1,0 +1,13 @@
+In GetCellValue, I forgot to convert the cell name parameter to upper-case so that both lower- and upper-case inputs are allowed.  My test cases should have caught this mistake, but they did not test for this error.
+With this change, I pass the following previously-failed tests:
+Formula1
+Formula2
+Formula3
+Formula4
+Formula4a
+Formula4b
+LongTestWithTimeout12
+LongTestWithTimeout15
+LongTestWithTimeout3
+LongTestWithTimeout6
+LongTestWithTimeout9
