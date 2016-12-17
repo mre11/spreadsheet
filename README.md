@@ -1,1 +1,1 @@
-Common code for the Spreadsheet project.
+This is a .NET spreadsheet editor written for my first semester of software engineering in Spring 2016.  In general, the public API for each class was specified in detail by the professor (Dr. Joe Zachary), and I provided the implementation.
